@@ -1,0 +1,1166 @@
+第一世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0001			妙蛙种子	フシギダネ	Bulbasaur	草	毒
+#0002			妙蛙草	フシギソウ	Ivysaur	草	毒
+#0003			妙蛙花	フシギバナ	Venusaur	草	毒
+#0004			小火龙	ヒトカゲ	Charmander	火
+#0005			火恐龙	リザード	Charmeleon	火
+#0006			喷火龙	リザードン	Charizard	火	飞行
+#0007			杰尼龟	ゼニガメ	Squirtle	水
+#0008			卡咪龟	カメール	Wartortle	水
+#0009			水箭龟	カメックス	Blastoise	水
+#0010			绿毛虫	キャタピー	Caterpie	虫
+#0011			铁甲蛹	トランセル	Metapod	虫
+#0012			巴大蝶	バタフリー	Butterfree	虫	飞行
+#0013			独角虫	ビードル	Weedle	虫	毒
+#0014			铁壳蛹	コクーン	Kakuna	虫	毒
+#0015			大针蜂	スピアー	Beedrill	虫	毒
+#0016			波波	ポッポ	Pidgey	一般	飞行
+#0017			比比鸟	ピジョン	Pidgeotto	一般	飞行
+#0018			大比鸟	ピジョット	Pidgeot	一般	飞行
+#0019			小拉达	コラッタ	Rattata	一般
+#0019			小拉达
+阿罗拉的样子	コラッタ	Rattata	恶	一般
+#0020			拉达	ラッタ	Raticate	一般
+#0020			拉达
+阿罗拉的样子	ラッタ	Raticate	恶	一般
+#0021			烈雀	オニスズメ	Spearow	一般	飞行
+#0022			大嘴雀	オニドリル	Fearow	一般	飞行
+#0023			阿柏蛇	アーボ	Ekans	毒
+#0024			阿柏怪	アーボック	Arbok	毒
+#0025			皮卡丘	ピカチュウ	Pikachu	电
+#0026			雷丘	ライチュウ	Raichu	电
+#0026			雷丘
+阿罗拉的样子	ライチュウ	Raichu	电	超能力
+#0027			穿山鼠	サンド	Sandshrew	地面
+#0027			穿山鼠
+阿罗拉的样子	サンド	Sandshrew	冰	钢
+#0028			穿山王	サンドパン	Sandslash	地面
+#0028			穿山王
+阿罗拉的样子	サンドパン	Sandslash	冰	钢
+#0029			尼多兰	ニドラン♀	Nidoran♀	毒
+#0030			尼多娜	ニドリーナ	Nidorina	毒
+#0031			尼多后	ニドクイン	Nidoqueen	毒	地面
+#0032			尼多朗	ニドラン♂	Nidoran♂	毒
+#0033			尼多力诺	ニドリーノ	Nidorino	毒
+#0034			尼多王	ニドキング	Nidoking	毒	地面
+#0035			皮皮*	ピッピ	Clefairy	妖精
+#0036			皮可西*	ピクシー	Clefable	妖精
+#0037			六尾	ロコン	Vulpix	火
+#0037			六尾
+阿罗拉的样子	ロコン	Vulpix	冰
+#0038			九尾	キュウコン	Ninetales	火
+#0038			九尾
+阿罗拉的样子	キュウコン	Ninetales	冰	妖精
+#0039			胖丁*	プリン	Jigglypuff	一般	妖精
+#0040			胖可丁*	プクリン	Wigglytuff	一般	妖精
+#0041			超音蝠	ズバット	Zubat	毒	飞行
+#0042			大嘴蝠	ゴルバット	Golbat	毒	飞行
+#0043			走路草	ナゾノクサ	Oddish	草	毒
+#0044			臭臭花	クサイハナ	Gloom	草	毒
+#0045			霸王花	ラフレシア	Vileplume	草	毒
+#0046			派拉斯	パラス	Paras	虫	草
+#0047			派拉斯特	パラセクト	Parasect	虫	草
+#0048			毛球	コンパン	Venonat	虫	毒
+#0049			摩鲁蛾	モルフォン	Venomoth	虫	毒
+#0050			地鼠	ディグダ	Diglett	地面
+#0050			地鼠
+阿罗拉的样子	ディグダ	Diglett	地面	钢
+#0051			三地鼠	ダグトリオ	Dugtrio	地面
+#0051			三地鼠
+阿罗拉的样子	ダグトリオ	Dugtrio	地面	钢
+#0052			喵喵	ニャース	Meowth	一般
+#0052			喵喵
+阿罗拉的样子	ニャース	Meowth	恶
+#0052			喵喵
+伽勒尔的样子	ニャース	Meowth	钢
+#0053			猫老大	ペルシアン	Persian	一般
+#0053			猫老大
+阿罗拉的样子	ペルシアン	Persian	恶
+#0054			可达鸭	コダック	Psyduck	水
+#0055			哥达鸭	ゴルダック	Golduck	水
+#0056			猴怪	マンキー	Mankey	格斗
+#0057			火暴猴	オコリザル	Primeape	格斗
+#0058			卡蒂狗	ガーディ	Growlithe	火
+#0058			卡蒂狗
+洗翠的样子	ガーディ	Growlithe	火	岩石
+#0059			风速狗	ウインディ	Arcanine	火
+#0059			风速狗
+洗翠的样子	ウインディ	Arcanine	火	岩石
+#0060			蚊香蝌蚪	ニョロモ	Poliwag	水
+#0061			蚊香君	ニョロゾ	Poliwhirl	水
+#0062			蚊香泳士	ニョロボン	Poliwrath	水	格斗
+#0063			凯西	ケーシィ	Abra	超能力
+#0064			勇基拉	ユンゲラー	Kadabra	超能力
+#0065			胡地	フーディン	Alakazam	超能力
+#0066			腕力	ワンリキー	Machop	格斗
+#0067			豪力	ゴーリキー	Machoke	格斗
+#0068			怪力	カイリキー	Machamp	格斗
+#0069			喇叭芽	マダツボミ	Bellsprout	草	毒
+#0070			口呆花	ウツドン	Weepinbell	草	毒
+#0071			大食花	ウツボット	Victreebel	草	毒
+#0072			玛瑙水母	メノクラゲ	Tentacool	水	毒
+#0073			毒刺水母	ドククラゲ	Tentacruel	水	毒
+#0074			小拳石	イシツブテ	Geodude	岩石	地面
+#0074			小拳石
+阿罗拉的样子	イシツブテ	Geodude	岩石	电
+#0075			隆隆石	ゴローン	Graveler	岩石	地面
+#0075			隆隆石
+阿罗拉的样子	ゴローン	Graveler	岩石	电
+#0076			隆隆岩	ゴローニャ	Golem	岩石	地面
+#0076			隆隆岩
+阿罗拉的样子	ゴローニャ	Golem	岩石	电
+#0077			小火马	ポニータ	Ponyta	火
+#0077			小火马
+伽勒尔的样子	ポニータ	Ponyta	超能力
+#0078			烈焰马	ギャロップ	Rapidash	火
+#0078			烈焰马
+伽勒尔的样子	ギャロップ	Rapidash	超能力	妖精
+#0079			呆呆兽	ヤドン	Slowpoke	水	超能力
+#0079			呆呆兽
+伽勒尔的样子	ヤドン	Slowpoke	超能力
+#0080			呆壳兽	ヤドラン	Slowbro	水	超能力
+#0080			呆壳兽
+伽勒尔的样子	ヤドラン	Slowbro	毒	超能力
+#0081			小磁怪*	コイル	Magnemite	电	钢
+#0082			三合一磁怪*	レアコイル	Magneton	电	钢
+#0083			大葱鸭	カモネギ	Farfetch'd	一般	飞行
+#0083			大葱鸭
+伽勒尔的样子	カモネギ	Farfetch'd	格斗
+#0084			嘟嘟	ドードー	Doduo	一般	飞行
+#0085			嘟嘟利	ドードリオ	Dodrio	一般	飞行
+#0086			小海狮	パウワウ	Seel	水
+#0087			白海狮	ジュゴン	Dewgong	水	冰
+#0088			臭泥	ベトベター	Grimer	毒
+#0088			臭泥
+阿罗拉的样子	ベトベター	Grimer	毒	恶
+#0089			臭臭泥	ベトベトン	Muk	毒
+#0089			臭臭泥
+阿罗拉的样子	ベトベトン	Muk	毒	恶
+#0090			大舌贝	シェルダー	Shellder	水
+#0091			刺甲贝	パルシェン	Cloyster	水	冰
+#0092			鬼斯	ゴース	Gastly	幽灵	毒
+#0093			鬼斯通	ゴースト	Haunter	幽灵	毒
+#0094			耿鬼	ゲンガー	Gengar	幽灵	毒
+#0095			大岩蛇	イワーク	Onix	岩石	地面
+#0096			催眠貘	スリープ	Drowzee	超能力
+#0097			引梦貘人	スリーパー	Hypno	超能力
+#0098			大钳蟹	クラブ	Krabby	水
+#0099			巨钳蟹	キングラー	Kingler	水
+#0100			霹雳电球	ビリリダマ	Voltorb	电
+#0100			霹雳电球
+洗翠的样子	ビリリダマ	Voltorb	电	草
+#0101			顽皮雷弹	マルマイン	Electrode	电
+#0101			顽皮雷弹
+洗翠的样子	マルマイン	Electrode	电	草
+#0102			蛋蛋	タマタマ	Exeggcute	草	超能力
+#0103			椰蛋树	ナッシー	Exeggutor	草	超能力
+#0103			椰蛋树
+阿罗拉的样子	ナッシー	Exeggutor	草	龙
+#0104			卡拉卡拉	カラカラ	Cubone	地面
+#0105			嘎啦嘎啦	ガラガラ	Marowak	地面
+#0105			嘎啦嘎啦
+阿罗拉的样子	ガラガラ	Marowak	火	幽灵
+#0106			飞腿郎	サワムラー	Hitmonlee	格斗
+#0107			快拳郎	エビワラー	Hitmonchan	格斗
+#0108			大舌头	ベロリンガ	Lickitung	一般
+#0109			瓦斯弹	ドガース	Koffing	毒
+#0110			双弹瓦斯	マタドガス	Weezing	毒
+#0110			双弹瓦斯
+伽勒尔的样子	マタドガス	Weezing	毒	妖精
+#0111			独角犀牛	サイホーン	Rhyhorn	地面	岩石
+#0112			钻角犀兽	サイドン	Rhydon	地面	岩石
+#0113			吉利蛋	ラッキー	Chansey	一般
+#0114			蔓藤怪	モンジャラ	Tangela	草
+#0115			袋兽	ガルーラ	Kangaskhan	一般
+#0116			墨海马	タッツー	Horsea	水
+#0117			海刺龙	シードラ	Seadra	水
+#0118			角金鱼	トサキント	Goldeen	水
+#0119			金鱼王	アズマオウ	Seaking	水
+#0120			海星星	ヒトデマン	Staryu	水
+#0121			宝石海星	スターミー	Starmie	水	超能力
+#0122			魔墙人偶*	バリヤード	Mr. Mime	超能力	妖精
+#0122			魔墙人偶
+伽勒尔的样子	バリヤード	Mr. Mime	冰	超能力
+#0123			飞天螳螂	ストライク	Scyther	虫	飞行
+#0124			迷唇姐	ルージュラ	Jynx	冰	超能力
+#0125			电击兽	エレブー	Electabuzz	电
+#0126			鸭嘴火兽	ブーバー	Magmar	火
+#0127			凯罗斯	カイロス	Pinsir	虫
+#0128			肯泰罗	ケンタロス	Tauros	一般
+#0128			肯泰罗
+帕底亚的样子（斗战种）	ケンタロス	Tauros	格斗
+#0128			肯泰罗
+帕底亚的样子（火炽种）	ケンタロス	Tauros	格斗	火
+#0128			肯泰罗
+帕底亚的样子（水澜种）	ケンタロス	Tauros	格斗	水
+#0129			鲤鱼王	コイキング	Magikarp	水
+#0130			暴鲤龙	ギャラドス	Gyarados	水	飞行
+#0131			拉普拉斯	ラプラス	Lapras	水	冰
+#0132			百变怪	メタモン	Ditto	一般
+#0133			伊布	イーブイ	Eevee	一般
+#0134			水伊布	シャワーズ	Vaporeon	水
+#0135			雷伊布	サンダース	Jolteon	电
+#0136			火伊布	ブースター	Flareon	火
+#0137			多边兽	ポリゴン	Porygon	一般
+#0138			菊石兽	オムナイト	Omanyte	岩石	水
+#0139			多刺菊石兽	オムスター	Omastar	岩石	水
+#0140			化石盔	カブト	Kabuto	岩石	水
+#0141			镰刀盔	カブトプス	Kabutops	岩石	水
+#0142			化石翼龙	プテラ	Aerodactyl	岩石	飞行
+#0143			卡比兽	カビゴン	Snorlax	一般
+#0144			急冻鸟	フリーザー	Articuno	冰	飞行
+#0144			急冻鸟
+伽勒尔的样子	フリーザー	Articuno	超能力	飞行
+#0145			闪电鸟	サンダー	Zapdos	电	飞行
+#0145			闪电鸟
+伽勒尔的样子	サンダー	Zapdos	格斗	飞行
+#0146			火焰鸟	ファイヤー	Moltres	火	飞行
+#0146			火焰鸟
+伽勒尔的样子	ファイヤー	Moltres	恶	飞行
+#0147			迷你龙	ミニリュウ	Dratini	龙
+#0148			哈克龙	ハクリュー	Dragonair	龙
+#0149			快龙	カイリュー	Dragonite	龙	飞行
+#0150			超梦	ミュウツー	Mewtwo	超能力
+#0151			梦幻	ミュウ	Mew	超能力
+第二世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0152			菊草叶	チコリータ	Chikorita	草
+#0153			月桂叶	ベイリーフ	Bayleef	草
+#0154			大竺葵	メガニウム	Meganium	草
+#0155			火球鼠	ヒノアラシ	Cyndaquil	火
+#0156			火岩鼠	マグマラシ	Quilava	火
+#0157			火暴兽	バクフーン	Typhlosion	火
+#0157			火暴兽
+洗翠的样子	バクフーン	Typhlosion	火	幽灵
+#0158			小锯鳄	ワニノコ	Totodile	水
+#0159			蓝鳄	アリゲイツ	Croconaw	水
+#0160			大力鳄	オーダイル	Feraligatr	水
+#0161			尾立	オタチ	Sentret	一般
+#0162			大尾立	オオタチ	Furret	一般
+#0163			咕咕	ホーホー	Hoothoot	一般	飞行
+#0164			猫头夜鹰	ヨルノズク	Noctowl	一般	飞行
+#0165			芭瓢虫	レディバ	Ledyba	虫	飞行
+#0166			安瓢虫	レディアン	Ledian	虫	飞行
+#0167			圆丝蛛	イトマル	Spinarak	虫	毒
+#0168			阿利多斯	アリアドス	Ariados	虫	毒
+#0169			叉字蝠	クロバット	Crobat	毒	飞行
+#0170			灯笼鱼	チョンチー	Chinchou	水	电
+#0171			电灯怪	ランターン	Lanturn	水	电
+#0172			皮丘	ピチュー	Pichu	电
+#0173			皮宝宝*	ピィ	Cleffa	妖精
+#0174			宝宝丁*	ププリン	Igglybuff	一般	妖精
+#0175			波克比*	トゲピー	Togepi	妖精
+#0176			波克基古*	トゲチック	Togetic	妖精	飞行
+#0177			天然雀	ネイティ	Natu	超能力	飞行
+#0178			天然鸟	ネイティオ	Xatu	超能力	飞行
+#0179			咩利羊	メリープ	Mareep	电
+#0180			茸茸羊	モココ	Flaaffy	电
+#0181			电龙	デンリュウ	Ampharos	电
+#0182			美丽花	キレイハナ	Bellossom	草
+#0183			玛力露*	マリル	Marill	水	妖精
+#0184			玛力露丽*	マリルリ	Azumarill	水	妖精
+#0185			树才怪	ウソッキー	Sudowoodo	岩石
+#0186			蚊香蛙皇	ニョロトノ	Politoed	水
+#0187			毽子草	ハネッコ	Hoppip	草	飞行
+#0188			毽子花	ポポッコ	Skiploom	草	飞行
+#0189			毽子棉	ワタッコ	Jumpluff	草	飞行
+#0190			长尾怪手	エイパム	Aipom	一般
+#0191			向日种子	ヒマナッツ	Sunkern	草
+#0192			向日花怪	キマワリ	Sunflora	草
+#0193			蜻蜻蜓	ヤンヤンマ	Yanma	虫	飞行
+#0194			乌波	ウパー	Wooper	水	地面
+#0194			乌波
+帕底亚的样子	ウパー	Wooper	毒	地面
+#0195			沼王	ヌオー	Quagsire	水	地面
+#0196			太阳伊布	エーフィ	Espeon	超能力
+#0197			月亮伊布	ブラッキー	Umbreon	恶
+#0198			黑暗鸦	ヤミカラス	Murkrow	恶	飞行
+#0199			呆呆王	ヤドキング	Slowking	水	超能力
+#0199			呆呆王
+伽勒尔的样子	ヤドキング	Slowking	毒	超能力
+#0200			梦妖	ムウマ	Misdreavus	幽灵
+#0201			未知图腾	アンノーン	Unown	超能力
+#0202			果然翁	ソーナンス	Wobbuffet	超能力
+#0203			麒麟奇	キリンリキ	Girafarig	一般	超能力
+#0204			榛果球	クヌギダマ	Pineco	虫
+#0205			佛烈托斯	フォレトス	Forretress	虫	钢
+#0206			土龙弟弟	ノコッチ	Dunsparce	一般
+#0207			天蝎	グライガー	Gligar	地面	飞行
+#0208			大钢蛇	ハガネール	Steelix	钢	地面
+#0209			布鲁*	ブルー	Snubbull	妖精
+#0210			布鲁皇*	グランブル	Granbull	妖精
+#0211			千针鱼	ハリーセン	Qwilfish	水	毒
+#0211			千针鱼
+洗翠的样子	ハリーセン	Qwilfish	恶	毒
+#0212			巨钳螳螂	ハッサム	Scizor	虫	钢
+#0213			壶壶	ツボツボ	Shuckle	虫	岩石
+#0214			赫拉克罗斯	ヘラクロス	Heracross	虫	格斗
+#0215			狃拉	ニューラ	Sneasel	恶	冰
+#0215			狃拉
+洗翠的样子	ニューラ	Sneasel	格斗	毒
+#0216			熊宝宝	ヒメグマ	Teddiursa	一般
+#0217			圈圈熊	リングマ	Ursaring	一般
+#0218			熔岩虫	マグマッグ	Slugma	火
+#0219			熔岩蜗牛	マグカルゴ	Magcargo	火	岩石
+#0220			小山猪	ウリムー	Swinub	冰	地面
+#0221			长毛猪	イノムー	Piloswine	冰	地面
+#0222			太阳珊瑚	サニーゴ	Corsola	水	岩石
+#0222			太阳珊瑚
+伽勒尔的样子	サニーゴ	Corsola	幽灵
+#0223			铁炮鱼	テッポウオ	Remoraid	水
+#0224			章鱼桶	オクタン	Octillery	水
+#0225			信使鸟	デリバード	Delibird	冰	飞行
+#0226			巨翅飞鱼	マンタイン	Mantine	水	飞行
+#0227			盔甲鸟	エアームド	Skarmory	钢	飞行
+#0228			戴鲁比	デルビル	Houndour	恶	火
+#0229			黑鲁加	ヘルガー	Houndoom	恶	火
+#0230			刺龙王	キングドラ	Kingdra	水	龙
+#0231			小小象	ゴマゾウ	Phanpy	地面
+#0232			顿甲	ドンファン	Donphan	地面
+#0233			多边兽２型	ポリゴン２	Porygon2	一般
+#0234			惊角鹿	オドシシ	Stantler	一般
+#0235			图图犬	ドーブル	Smeargle	一般
+#0236			无畏小子	バルキー	Tyrogue	格斗
+#0237			战舞郎	カポエラー	Hitmontop	格斗
+#0238			迷唇娃	ムチュール	Smoochum	冰	超能力
+#0239			电击怪	エレキッド	Elekid	电
+#0240			鸭嘴宝宝	ブビィ	Magby	火
+#0241			大奶罐	ミルタンク	Miltank	一般
+#0242			幸福蛋	ハピナス	Blissey	一般
+#0243			雷公	ライコウ	Raikou	电
+#0244			炎帝	エンテイ	Entei	火
+#0245			水君	スイクン	Suicune	水
+#0246			幼基拉斯	ヨーギラス	Larvitar	岩石	地面
+#0247			沙基拉斯	サナギラス	Pupitar	岩石	地面
+#0248			班基拉斯	バンギラス	Tyranitar	岩石	恶
+#0249			洛奇亚	ルギア	Lugia	超能力	飞行
+#0250			凤王	ホウオウ	Ho-Oh	火	飞行
+#0251			时拉比	セレビィ	Celebi	超能力	草
+第三世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0252			木守宫	キモリ	Treecko	草
+#0253			森林蜥蜴	ジュプトル	Grovyle	草
+#0254			蜥蜴王	ジュカイン	Sceptile	草
+#0255			火稚鸡	アチャモ	Torchic	火
+#0256			力壮鸡	ワカシャモ	Combusken	火	格斗
+#0257			火焰鸡	バシャーモ	Blaziken	火	格斗
+#0258			水跃鱼	ミズゴロウ	Mudkip	水
+#0259			沼跃鱼	ヌマクロー	Marshtomp	水	地面
+#0260			巨沼怪	ラグラージ	Swampert	水	地面
+#0261			土狼犬	ポチエナ	Poochyena	恶
+#0262			大狼犬	グラエナ	Mightyena	恶
+#0263			蛇纹熊	ジグザグマ	Zigzagoon	一般
+#0263			蛇纹熊
+伽勒尔的样子	ジグザグマ	Zigzagoon	恶	一般
+#0264			直冲熊	マッスグマ	Linoone	一般
+#0264			直冲熊
+伽勒尔的样子	マッスグマ	Linoone	恶	一般
+#0265			刺尾虫	ケムッソ	Wurmple	虫
+#0266			甲壳茧	カラサリス	Silcoon	虫
+#0267			狩猎凤蝶	アゲハント	Beautifly	虫	飞行
+#0268			盾甲茧	マユルド	Cascoon	虫
+#0269			毒粉蛾	ドクケイル	Dustox	虫	毒
+#0270			莲叶童子	ハスボー	Lotad	水	草
+#0271			莲帽小童	ハスブレロ	Lombre	水	草
+#0272			乐天河童	ルンパッパ	Ludicolo	水	草
+#0273			橡实果	タネボー	Seedot	草
+#0274			长鼻叶	コノハナ	Nuzleaf	草	恶
+#0275			狡猾天狗	ダーテング	Shiftry	草	恶
+#0276			傲骨燕	スバメ	Taillow	一般	飞行
+#0277			大王燕	オオスバメ	Swellow	一般	飞行
+#0278			长翅鸥	キャモメ	Wingull	水	飞行
+#0279			大嘴鸥	ペリッパー	Pelipper	水	飞行
+#0280			拉鲁拉丝*	ラルトス	Ralts	超能力	妖精
+#0281			奇鲁莉安*	キルリア	Kirlia	超能力	妖精
+#0282			沙奈朵*	サーナイト	Gardevoir	超能力	妖精
+#0283			溜溜糖球	アメタマ	Surskit	虫	水
+#0284			雨翅蛾	アメモース	Masquerain	虫	飞行
+#0285			蘑蘑菇	キノココ	Shroomish	草
+#0286			斗笠菇	キノガッサ	Breloom	草	格斗
+#0287			懒人獭	ナマケロ	Slakoth	一般
+#0288			过动猿	ヤルキモノ	Vigoroth	一般
+#0289			请假王	ケッキング	Slaking	一般
+#0290			土居忍士	ツチニン	Nincada	虫	地面
+#0291			铁面忍者	テッカニン	Ninjask	虫	飞行
+#0292			脱壳忍者	ヌケニン	Shedinja	虫	幽灵
+#0293			咕妞妞	ゴニョニョ	Whismur	一般
+#0294			吼爆弹	ドゴーム	Loudred	一般
+#0295			爆音怪	バクオング	Exploud	一般
+#0296			幕下力士	マクノシタ	Makuhita	格斗
+#0297			铁掌力士	ハリテヤマ	Hariyama	格斗
+#0298			露力丽*	ルリリ	Azurill	一般	妖精
+#0299			朝北鼻	ノズパス	Nosepass	岩石
+#0300			向尾喵	エネコ	Skitty	一般
+#0301			优雅猫	エネコロロ	Delcatty	一般
+#0302			勾魂眼	ヤミラミ	Sableye	恶	幽灵
+#0303			大嘴娃*	クチート	Mawile	钢	妖精
+#0304			可可多拉	ココドラ	Aron	钢	岩石
+#0305			可多拉	コドラ	Lairon	钢	岩石
+#0306			波士可多拉	ボスゴドラ	Aggron	钢	岩石
+#0307			玛沙那	アサナン	Meditite	格斗	超能力
+#0308			恰雷姆	チャーレム	Medicham	格斗	超能力
+#0309			落雷兽	ラクライ	Electrike	电
+#0310			雷电兽	ライボルト	Manectric	电
+#0311			正电拍拍	プラスル	Plusle	电
+#0312			负电拍拍	マイナン	Minun	电
+#0313			电萤虫	バルビート	Volbeat	虫
+#0314			甜甜萤	イルミーゼ	Illumise	虫
+#0315			毒蔷薇	ロゼリア	Roselia	草	毒
+#0316			溶食兽	ゴクリン	Gulpin	毒
+#0317			吞食兽	マルノーム	Swalot	毒
+#0318			利牙鱼	キバニア	Carvanha	水	恶
+#0319			巨牙鲨	サメハダー	Sharpedo	水	恶
+#0320			吼吼鲸	ホエルコ	Wailmer	水
+#0321			吼鲸王	ホエルオー	Wailord	水
+#0322			呆火驼	ドンメル	Numel	火	地面
+#0323			喷火驼	バクーダ	Camerupt	火	地面
+#0324			煤炭龟	コータス	Torkoal	火
+#0325			跳跳猪	バネブー	Spoink	超能力
+#0326			噗噗猪	ブーピッグ	Grumpig	超能力
+#0327			晃晃斑	パッチール	Spinda	一般
+#0328			大颚蚁	ナックラー	Trapinch	地面
+#0329			超音波幼虫	ビブラーバ	Vibrava	地面	龙
+#0330			沙漠蜻蜓	フライゴン	Flygon	地面	龙
+#0331			刺球仙人掌	サボネア	Cacnea	草
+#0332			梦歌仙人掌	ノクタス	Cacturne	草	恶
+#0333			青绵鸟	チルット	Swablu	一般	飞行
+#0334			七夕青鸟	チルタリス	Altaria	龙	飞行
+#0335			猫鼬斩	ザングース	Zangoose	一般
+#0336			饭匙蛇	ハブネーク	Seviper	毒
+#0337			月石	ルナトーン	Lunatone	岩石	超能力
+#0338			太阳岩	ソルロック	Solrock	岩石	超能力
+#0339			泥泥鳅	ドジョッチ	Barboach	水	地面
+#0340			鲶鱼王	ナマズン	Whiscash	水	地面
+#0341			龙虾小兵	ヘイガニ	Corphish	水
+#0342			铁螯龙虾	シザリガー	Crawdaunt	水	恶
+#0343			天秤偶	ヤジロン	Baltoy	地面	超能力
+#0344			念力土偶	ネンドール	Claydol	地面	超能力
+#0345			触手百合	リリーラ	Lileep	岩石	草
+#0346			摇篮百合	ユレイドル	Cradily	岩石	草
+#0347			太古羽虫	アノプス	Anorith	岩石	虫
+#0348			太古盔甲	アーマルド	Armaldo	岩石	虫
+#0349			丑丑鱼	ヒンバス	Feebas	水
+#0350			美纳斯	ミロカロス	Milotic	水
+#0351			飘浮泡泡	ポワルン	Castform	一般
+#0352			变隐龙	カクレオン	Kecleon	一般
+#0353			怨影娃娃	カゲボウズ	Shuppet	幽灵
+#0354			诅咒娃娃	ジュペッタ	Banette	幽灵
+#0355			夜巡灵	ヨマワル	Duskull	幽灵
+#0356			彷徨夜灵	サマヨール	Dusclops	幽灵
+#0357			热带龙	トロピウス	Tropius	草	飞行
+#0358			风铃铃	チリーン	Chimecho	超能力
+#0359			阿勃梭鲁	アブソル	Absol	恶
+#0360			小果然	ソーナノ	Wynaut	超能力
+#0361			雪童子	ユキワラシ	Snorunt	冰
+#0362			冰鬼护	オニゴーリ	Glalie	冰
+#0363			海豹球	タマザラシ	Spheal	冰	水
+#0364			海魔狮	トドグラー	Sealeo	冰	水
+#0365			帝牙海狮	トドゼルガ	Walrein	冰	水
+#0366			珍珠贝	パールル	Clamperl	水
+#0367			猎斑鱼	ハンテール	Huntail	水
+#0368			樱花鱼	サクラビス	Gorebyss	水
+#0369			古空棘鱼	ジーランス	Relicanth	水	岩石
+#0370			爱心鱼	ラブカス	Luvdisc	水
+#0371			宝贝龙	タツベイ	Bagon	龙
+#0372			甲壳龙	コモルー	Shelgon	龙
+#0373			暴飞龙	ボーマンダ	Salamence	龙	飞行
+#0374			铁哑铃	ダンバル	Beldum	钢	超能力
+#0375			金属怪	メタング	Metang	钢	超能力
+#0376			巨金怪	メタグロス	Metagross	钢	超能力
+#0377			雷吉洛克	レジロック	Regirock	岩石
+#0378			雷吉艾斯	レジアイス	Regice	冰
+#0379			雷吉斯奇鲁	レジスチル	Registeel	钢
+#0380			拉帝亚斯	ラティアス	Latias	龙	超能力
+#0381			拉帝欧斯	ラティオス	Latios	龙	超能力
+#0382			盖欧卡	カイオーガ	Kyogre	水
+#0383			固拉多	グラードン	Groudon	地面
+#0384			烈空坐	レックウザ	Rayquaza	龙	飞行
+#0385			基拉祈	ジラーチ	Jirachi	钢	超能力
+#0386			代欧奇希斯	デオキシス	Deoxys	超能力
+第四世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0387			草苗龟	ナエトル	Turtwig	草
+#0388			树林龟	ハヤシガメ	Grotle	草
+#0389			土台龟	ドダイトス	Torterra	草	地面
+#0390			小火焰猴	ヒコザル	Chimchar	火
+#0391			猛火猴	モウカザル	Monferno	火	格斗
+#0392			烈焰猴	ゴウカザル	Infernape	火	格斗
+#0393			波加曼	ポッチャマ	Piplup	水
+#0394			波皇子	ポッタイシ	Prinplup	水
+#0395			帝王拿波	エンペルト	Empoleon	水	钢
+#0396			姆克儿	ムックル	Starly	一般	飞行
+#0397			姆克鸟	ムクバード	Staravia	一般	飞行
+#0398			姆克鹰	ムクホーク	Staraptor	一般	飞行
+#0399			大牙狸	ビッパ	Bidoof	一般
+#0400			大尾狸	ビーダル	Bibarel	一般	水
+#0401			圆法师	コロボーシ	Kricketot	虫
+#0402			音箱蟀	コロトック	Kricketune	虫
+#0403			小猫怪	コリンク	Shinx	电
+#0404			勒克猫	ルクシオ	Luxio	电
+#0405			伦琴猫	レントラー	Luxray	电
+#0406			含羞苞	スボミー	Budew	草	毒
+#0407			罗丝雷朵	ロズレイド	Roserade	草	毒
+#0408			头盖龙	ズガイドス	Cranidos	岩石
+#0409			战槌龙	ラムパルド	Rampardos	岩石
+#0410			盾甲龙	タテトプス	Shieldon	岩石	钢
+#0411			护城龙	トリデプス	Bastiodon	岩石	钢
+#0412			结草儿	ミノムッチ	Burmy	虫
+#0413			结草贵妇	ミノマダム	Wormadam	虫	草
+#0414			绅士蛾	ガーメイル	Mothim	虫	飞行
+#0415			三蜜蜂	ミツハニー	Combee	虫	飞行
+#0416			蜂女王	ビークイン	Vespiquen	虫	飞行
+#0417			帕奇利兹	パチリス	Pachirisu	电
+#0418			泳圈鼬	ブイゼル	Buizel	水
+#0419			浮潜鼬	フローゼル	Floatzel	水
+#0420			樱花宝	チェリンボ	Cherubi	草
+#0421			樱花儿	チェリム	Cherrim	草
+#0422			无壳海兔	カラナクシ	Shellos	水
+#0423			海兔兽	トリトドン	Gastrodon	水	地面
+#0424			双尾怪手	エテボース	Ambipom	一般
+#0425			飘飘球	フワンテ	Drifloon	幽灵	飞行
+#0426			随风球	フワライド	Drifblim	幽灵	飞行
+#0427			卷卷耳	ミミロル	Buneary	一般
+#0428			长耳兔	ミミロップ	Lopunny	一般
+#0429			梦妖魔	ムウマージ	Mismagius	幽灵
+#0430			乌鸦头头	ドンカラス	Honchkrow	恶	飞行
+#0431			魅力喵	ニャルマー	Glameow	一般
+#0432			东施喵	ブニャット	Purugly	一般
+#0433			铃铛响	リーシャン	Chingling	超能力
+#0434			臭鼬噗	スカンプー	Stunky	毒	恶
+#0435			坦克臭鼬	スカタンク	Skuntank	毒	恶
+#0436			铜镜怪	ドーミラー	Bronzor	钢	超能力
+#0437			青铜钟	ドータクン	Bronzong	钢	超能力
+#0438			盆才怪	ウソハチ	Bonsly	岩石
+#0439			魔尼尼*	マネネ	Mime Jr.	超能力	妖精
+#0440			小福蛋	ピンプク	Happiny	一般
+#0441			聒噪鸟	ペラップ	Chatot	一般	飞行
+#0442			花岩怪	ミカルゲ	Spiritomb	幽灵	恶
+#0443			圆陆鲨	フカマル	Gible	龙	地面
+#0444			尖牙陆鲨	ガバイト	Gabite	龙	地面
+#0445			烈咬陆鲨	ガブリアス	Garchomp	龙	地面
+#0446			小卡比兽	ゴンベ	Munchlax	一般
+#0447			利欧路	リオル	Riolu	格斗
+#0448			路卡利欧	ルカリオ	Lucario	格斗	钢
+#0449			沙河马	ヒポポタス	Hippopotas	地面
+#0450			河马兽	カバルドン	Hippowdon	地面
+#0451			钳尾蝎	スコルピ	Skorupi	毒	虫
+#0452			龙王蝎	ドラピオン	Drapion	毒	恶
+#0453			不良蛙	グレッグル	Croagunk	毒	格斗
+#0454			毒骷蛙	ドクロッグ	Toxicroak	毒	格斗
+#0455			尖牙笼	マスキッパ	Carnivine	草
+#0456			荧光鱼	ケイコウオ	Finneon	水
+#0457			霓虹鱼	ネオラント	Lumineon	水
+#0458			小球飞鱼	タマンタ	Mantyke	水	飞行
+#0459			雪笠怪	ユキカブリ	Snover	草	冰
+#0460			暴雪王	ユキノオー	Abomasnow	草	冰
+#0461			玛狃拉	マニューラ	Weavile	恶	冰
+#0462			自爆磁怪	ジバコイル	Magnezone	电	钢
+#0463			大舌舔	ベロベルト	Lickilicky	一般
+#0464			超甲狂犀	ドサイドン	Rhyperior	地面	岩石
+#0465			巨蔓藤	モジャンボ	Tangrowth	草
+#0466			电击魔兽	エレキブル	Electivire	电
+#0467			鸭嘴炎兽	ブーバーン	Magmortar	火
+#0468			波克基斯*	トゲキッス	Togekiss	妖精	飞行
+#0469			远古巨蜓	メガヤンマ	Yanmega	虫	飞行
+#0470			叶伊布	リーフィア	Leafeon	草
+#0471			冰伊布	グレイシア	Glaceon	冰
+#0472			天蝎王	グライオン	Gliscor	地面	飞行
+#0473			象牙猪	マンムー	Mamoswine	冰	地面
+#0474			多边兽乙型	ポリゴンＺ	Porygon-Z	一般
+#0475			艾路雷朵	エルレイド	Gallade	超能力	格斗
+#0476			大朝北鼻	ダイノーズ	Probopass	岩石	钢
+#0477			黑夜魔灵	ヨノワール	Dusknoir	幽灵
+#0478			雪妖女	ユキメノコ	Froslass	冰	幽灵
+#0479			洛托姆	ロトム	Rotom	电	幽灵
+#0480			由克希	ユクシー	Uxie	超能力
+#0481			艾姆利多	エムリット	Mesprit	超能力
+#0482			亚克诺姆	アグノム	Azelf	超能力
+#0483			帝牙卢卡	ディアルガ	Dialga	钢	龙
+#0484			帕路奇亚	パルキア	Palkia	水	龙
+#0485			席多蓝恩	ヒードラン	Heatran	火	钢
+#0486			雷吉奇卡斯	レジギガス	Regigigas	一般
+#0487			骑拉帝纳	ギラティナ	Giratina	幽灵	龙
+#0488			克雷色利亚	クレセリア	Cresselia	超能力
+#0489			霏欧纳	フィオネ	Phione	水
+#0490			玛纳霏	マナフィ	Manaphy	水
+#0491			达克莱伊	ダークライ	Darkrai	恶
+#0492			谢米	シェイミ	Shaymin	草
+#0493			阿尔宙斯	アルセウス	Arceus	一般
+第五世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0494			比克提尼	ビクティニ	Victini	超能力	火
+#0495			藤藤蛇	ツタージャ	Snivy	草
+#0496			青藤蛇	ジャノビー	Servine	草
+#0497			君主蛇	ジャローダ	Serperior	草
+#0498			暖暖猪	ポカブ	Tepig	火
+#0499			炒炒猪	チャオブー	Pignite	火	格斗
+#0500			炎武王	エンブオー	Emboar	火	格斗
+#0501			水水獭	ミジュマル	Oshawott	水
+#0502			双刃丸	フタチマル	Dewott	水
+#0503			大剑鬼	ダイケンキ	Samurott	水
+#0503			大剑鬼
+洗翠的样子	ダイケンキ	Samurott	水	恶
+#0504			探探鼠	ミネズミ	Patrat	一般
+#0505			步哨鼠	ミルホッグ	Watchog	一般
+#0506			小约克	ヨーテリー	Lillipup	一般
+#0507			哈约克	ハーデリア	Herdier	一般
+#0508			长毛狗	ムーランド	Stoutland	一般
+#0509			扒手猫	チョロネコ	Purrloin	恶
+#0510			酷豹	レパルダス	Liepard	恶
+#0511			花椰猴	ヤナップ	Pansage	草
+#0512			花椰猿	ヤナッキー	Simisage	草
+#0513			爆香猴	バオップ	Pansear	火
+#0514			爆香猿	バオッキー	Simisear	火
+#0515			冷水猴	ヒヤップ	Panpour	水
+#0516			冷水猿	ヒヤッキー	Simipour	水
+#0517			食梦梦	ムンナ	Munna	超能力
+#0518			梦梦蚀	ムシャーナ	Musharna	超能力
+#0519			豆豆鸽	マメパト	Pidove	一般	飞行
+#0520			咕咕鸽	ハトーボー	Tranquill	一般	飞行
+#0521			高傲雉鸡	ケンホロウ	Unfezant	一般	飞行
+#0522			斑斑马	シママ	Blitzle	电
+#0523			雷电斑马	ゼブライカ	Zebstrika	电
+#0524			石丸子	ダンゴロ	Roggenrola	岩石
+#0525			地幔岩	ガントル	Boldore	岩石
+#0526			庞岩怪	ギガイアス	Gigalith	岩石
+#0527			滚滚蝙蝠	コロモリ	Woobat	超能力	飞行
+#0528			心蝙蝠	ココロモリ	Swoobat	超能力	飞行
+#0529			螺钉地鼠	モグリュー	Drilbur	地面
+#0530			龙头地鼠	ドリュウズ	Excadrill	地面	钢
+#0531			差不多娃娃	タブンネ	Audino	一般
+#0532			搬运小匠	ドッコラー	Timburr	格斗
+#0533			铁骨土人	ドテッコツ	Gurdurr	格斗
+#0534			修建老匠	ローブシン	Conkeldurr	格斗
+#0535			圆蝌蚪	オタマロ	Tympole	水
+#0536			蓝蟾蜍	ガマガル	Palpitoad	水	地面
+#0537			蟾蜍王	ガマゲロゲ	Seismitoad	水	地面
+#0538			投摔鬼	ナゲキ	Throh	格斗
+#0539			打击鬼	ダゲキ	Sawk	格斗
+#0540			虫宝包	クルミル	Sewaddle	虫	草
+#0541			宝包茧	クルマユ	Swadloon	虫	草
+#0542			保姆虫	ハハコモリ	Leavanny	虫	草
+#0543			百足蜈蚣	フシデ	Venipede	虫	毒
+#0544			车轮球	ホイーガ	Whirlipede	虫	毒
+#0545			蜈蚣王	ペンドラー	Scolipede	虫	毒
+#0546			木棉球*	モンメン	Cottonee	草	妖精
+#0547			风妖精*	エルフーン	Whimsicott	草	妖精
+#0548			百合根娃娃	チュリネ	Petilil	草
+#0549			裙儿小姐	ドレディア	Lilligant	草
+#0549			裙儿小姐
+洗翠的样子	ドレディア	Lilligant	草	格斗
+#0550			野蛮鲈鱼	バスラオ	Basculin	水
+#0551			黑眼鳄	メグロコ	Sandile	地面	恶
+#0552			混混鳄	ワルビル	Krokorok	地面	恶
+#0553			流氓鳄	ワルビアル	Krookodile	地面	恶
+#0554			火红不倒翁	ダルマッカ	Darumaka	火
+#0554			火红不倒翁
+伽勒尔的样子	ダルマッカ	Darumaka	冰
+#0555			达摩狒狒	ヒヒダルマ	Darmanitan	火
+#0555			达摩狒狒
+伽勒尔的样子	ヒヒダルマ	Darmanitan	冰
+#0556			沙铃仙人掌	マラカッチ	Maractus	草
+#0557			石居蟹	イシズマイ	Dwebble	虫	岩石
+#0558			岩殿居蟹	イワパレス	Crustle	虫	岩石
+#0559			滑滑小子	ズルッグ	Scraggy	恶	格斗
+#0560			头巾混混	ズルズキン	Scrafty	恶	格斗
+#0561			象征鸟	シンボラー	Sigilyph	超能力	飞行
+#0562			哭哭面具	デスマス	Yamask	幽灵
+#0562			哭哭面具
+伽勒尔的样子	デスマス	Yamask	地面	幽灵
+#0563			迭失棺	デスカーン	Cofagrigus	幽灵
+#0564			原盖海龟	プロトーガ	Tirtouga	水	岩石
+#0565			肋骨海龟	アバゴーラ	Carracosta	水	岩石
+#0566			始祖小鸟	アーケン	Archen	岩石	飞行
+#0567			始祖大鸟	アーケオス	Archeops	岩石	飞行
+#0568			破破袋	ヤブクロン	Trubbish	毒
+#0569			灰尘山	ダストダス	Garbodor	毒
+#0570			索罗亚	ゾロア	Zorua	恶
+#0570			索罗亚
+洗翠的样子	ゾロア	Zorua	一般	幽灵
+#0571			索罗亚克	ゾロアーク	Zoroark	恶
+#0571			索罗亚克
+洗翠的样子	ゾロアーク	Zoroark	一般	幽灵
+#0572			泡沫栗鼠	チラーミィ	Minccino	一般
+#0573			奇诺栗鼠	チラチーノ	Cinccino	一般
+#0574			哥德宝宝	ゴチム	Gothita	超能力
+#0575			哥德小童	ゴチミル	Gothorita	超能力
+#0576			哥德小姐	ゴチルゼル	Gothitelle	超能力
+#0577			单卵细胞球	ユニラン	Solosis	超能力
+#0578			双卵细胞球	ダブラン	Duosion	超能力
+#0579			人造细胞卵	ランクルス	Reuniclus	超能力
+#0580			鸭宝宝	コアルヒー	Ducklett	水	飞行
+#0581			舞天鹅	スワンナ	Swanna	水	飞行
+#0582			迷你冰	バニプッチ	Vanillite	冰
+#0583			多多冰	バニリッチ	Vanillish	冰
+#0584			双倍多多冰	バイバニラ	Vanilluxe	冰
+#0585			四季鹿	シキジカ	Deerling	一般	草
+#0586			萌芽鹿	メブキジカ	Sawsbuck	一般	草
+#0587			电飞鼠	エモンガ	Emolga	电	飞行
+#0588			盖盖虫	カブルモ	Karrablast	虫
+#0589			骑士蜗牛	シュバルゴ	Escavalier	虫	钢
+#0590			哎呀球菇	タマゲタケ	Foongus	草	毒
+#0591			败露球菇	モロバレル	Amoonguss	草	毒
+#0592			轻飘飘	プルリル	Frillish	水	幽灵
+#0593			胖嘟嘟	ブルンゲル	Jellicent	水	幽灵
+#0594			保姆曼波	ママンボウ	Alomomola	水
+#0595			电电虫	バチュル	Joltik	虫	电
+#0596			电蜘蛛	デンチュラ	Galvantula	虫	电
+#0597			种子铁球	テッシード	Ferroseed	草	钢
+#0598			坚果哑铃	ナットレイ	Ferrothorn	草	钢
+#0599			齿轮儿	ギアル	Klink	钢
+#0600			齿轮组	ギギアル	Klang	钢
+#0601			齿轮怪	ギギギアル	Klinklang	钢
+#0602			麻麻小鱼	シビシラス	Tynamo	电
+#0603			麻麻鳗	シビビール	Eelektrik	电
+#0604			麻麻鳗鱼王	シビルドン	Eelektross	电
+#0605			小灰怪	リグレー	Elgyem	超能力
+#0606			大宇怪	オーベム	Beheeyem	超能力
+#0607			烛光灵	ヒトモシ	Litwick	幽灵	火
+#0608			灯火幽灵	ランプラー	Lampent	幽灵	火
+#0609			水晶灯火灵	シャンデラ	Chandelure	幽灵	火
+#0610			牙牙	キバゴ	Axew	龙
+#0611			斧牙龙	オノンド	Fraxure	龙
+#0612			双斧战龙	オノノクス	Haxorus	龙
+#0613			喷嚏熊	クマシュン	Cubchoo	冰
+#0614			冻原熊	ツンベアー	Beartic	冰
+#0615			几何雪花	フリージオ	Cryogonal	冰
+#0616			小嘴蜗	チョボマキ	Shelmet	虫
+#0617			敏捷虫	アギルダー	Accelgor	虫
+#0618			泥巴鱼	マッギョ	Stunfisk	地面	电
+#0618			泥巴鱼
+伽勒尔的样子	マッギョ	Stunfisk	地面	钢
+#0619			功夫鼬	コジョフー	Mienfoo	格斗
+#0620			师父鼬	コジョンド	Mienshao	格斗
+#0621			赤面龙	クリムガン	Druddigon	龙
+#0622			泥偶小人	ゴビット	Golett	地面	幽灵
+#0623			泥偶巨人	ゴルーグ	Golurk	地面	幽灵
+#0624			驹刀小兵	コマタナ	Pawniard	恶	钢
+#0625			劈斩司令	キリキザン	Bisharp	恶	钢
+#0626			爆炸头水牛	バッフロン	Bouffalant	一般
+#0627			毛头小鹰	ワシボン	Rufflet	一般	飞行
+#0628			勇士雄鹰	ウォーグル	Braviary	一般	飞行
+#0628			勇士雄鹰
+洗翠的样子	ウォーグル	Braviary	超能力	飞行
+#0629			秃鹰丫头	バルチャイ	Vullaby	恶	飞行
+#0630			秃鹰娜	バルジーナ	Mandibuzz	恶	飞行
+#0631			熔蚁兽	クイタラン	Heatmor	火
+#0632			铁蚁	アイアント	Durant	虫	钢
+#0633			单首龙	モノズ	Deino	恶	龙
+#0634			双首暴龙	ジヘッド	Zweilous	恶	龙
+#0635			三首恶龙	サザンドラ	Hydreigon	恶	龙
+#0636			燃烧虫	メラルバ	Larvesta	虫	火
+#0637			火神蛾	ウルガモス	Volcarona	虫	火
+#0638			勾帕路翁	コバルオン	Cobalion	钢	格斗
+#0639			代拉基翁	テラキオン	Terrakion	岩石	格斗
+#0640			毕力吉翁	ビリジオン	Virizion	草	格斗
+#0641			龙卷云	トルネロス	Tornadus	飞行
+#0642			雷电云	ボルトロス	Thundurus	电	飞行
+#0643			莱希拉姆	レシラム	Reshiram	龙	火
+#0644			捷克罗姆	ゼクロム	Zekrom	龙	电
+#0645			土地云	ランドロス	Landorus	地面	飞行
+#0646			酋雷姆	キュレム	Kyurem	龙	冰
+#0647			凯路迪欧	ケルディオ	Keldeo	水	格斗
+#0648			美洛耶塔	メロエッタ	Meloetta	一般	超能力
+#0649			盖诺赛克特	ゲノセクト	Genesect	虫	钢
+第六世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0650			哈力栗	ハリマロン	Chespin	草
+#0651			胖胖哈力	ハリボーグ	Quilladin	草
+#0652			布里卡隆	ブリガロン	Chesnaught	草	格斗
+#0653			火狐狸	フォッコ	Fennekin	火
+#0654			长尾火狐	テールナー	Braixen	火
+#0655			妖火红狐	マフォクシー	Delphox	火	超能力
+#0656			呱呱泡蛙	ケロマツ	Froakie	水
+#0657			呱头蛙	ゲコガシラ	Frogadier	水
+#0658			甲贺忍蛙	ゲッコウガ	Greninja	水	恶
+#0659			掘掘兔	ホルビー	Bunnelby	一般
+#0660			掘地兔	ホルード	Diggersby	一般	地面
+#0661			小箭雀	ヤヤコマ	Fletchling	一般	飞行
+#0662			火箭雀	ヒノヤコマ	Fletchinder	火	飞行
+#0663			烈箭鹰	ファイアロー	Talonflame	火	飞行
+#0664			粉蝶虫	コフキムシ	Scatterbug	虫
+#0665			粉蝶蛹	コフーライ	Spewpa	虫
+#0666			彩粉蝶	ビビヨン	Vivillon	虫	飞行
+#0667			小狮狮	シシコ	Litleo	火	一般
+#0668			火炎狮	カエンジシ	Pyroar	火	一般
+#0669			花蓓蓓	フラベベ	Flabébé	妖精
+#0670			花叶蒂	フラエッテ	Floette	妖精
+#0671			花洁夫人	フラージェス	Florges	妖精
+#0672			坐骑小羊	メェークル	Skiddo	草
+#0673			坐骑山羊	ゴーゴート	Gogoat	草
+#0674			顽皮熊猫	ヤンチャム	Pancham	格斗
+#0675			霸道熊猫	ゴロンダ	Pangoro	格斗	恶
+#0676			多丽米亚	トリミアン	Furfrou	一般
+#0677			妙喵	ニャスパー	Espurr	超能力
+#0678			超能妙喵	ニャオニクス	Meowstic	超能力
+#0679			独剑鞘	ヒトツキ	Honedge	钢	幽灵
+#0680			双剑鞘	ニダンギル	Doublade	钢	幽灵
+#0681			坚盾剑怪	ギルガルド	Aegislash	钢	幽灵
+#0682			粉香香	シュシュプ	Spritzee	妖精
+#0683			芳香精	フレフワン	Aromatisse	妖精
+#0684			绵绵泡芙	ペロッパフ	Swirlix	妖精
+#0685			胖甜妮	ペロリーム	Slurpuff	妖精
+#0686			好啦鱿	マーイーカ	Inkay	恶	超能力
+#0687			乌贼王	カラマネロ	Malamar	恶	超能力
+#0688			龟脚脚	カメテテ	Binacle	岩石	水
+#0689			龟足巨铠	ガメノデス	Barbaracle	岩石	水
+#0690			垃垃藻	クズモー	Skrelp	毒	水
+#0691			毒藻龙	ドラミドロ	Dragalge	毒	龙
+#0692			铁臂枪虾	ウデッポウ	Clauncher	水
+#0693			钢炮臂虾	ブロスター	Clawitzer	水
+#0694			伞电蜥	エリキテル	Helioptile	电	一般
+#0695			光电伞蜥	エレザード	Heliolisk	电	一般
+#0696			宝宝暴龙	チゴラス	Tyrunt	岩石	龙
+#0697			怪颚龙	ガチゴラス	Tyrantrum	岩石	龙
+#0698			冰雪龙	アマルス	Amaura	岩石	冰
+#0699			冰雪巨龙	アマルルガ	Aurorus	岩石	冰
+#0700			仙子伊布	ニンフィア	Sylveon	妖精
+#0701			摔角鹰人	ルチャブル	Hawlucha	格斗	飞行
+#0702			咚咚鼠	デデンネ	Dedenne	电	妖精
+#0703			小碎钻	メレシー	Carbink	岩石	妖精
+#0704			黏黏宝	ヌメラ	Goomy	龙
+#0705			黏美儿	ヌメイル	Sliggoo	龙
+#0705			黏美儿
+洗翠的样子	ヌメイル	Sliggoo	钢	龙
+#0706			黏美龙	ヌメルゴン	Goodra	龙
+#0706			黏美龙
+洗翠的样子	ヌメルゴン	Goodra	钢	龙
+#0707			钥圈儿	クレッフィ	Klefki	钢	妖精
+#0708			小木灵	ボクレー	Phantump	幽灵	草
+#0709			朽木妖	オーロット	Trevenant	幽灵	草
+#0710			南瓜精	バケッチャ	Pumpkaboo	幽灵	草
+#0711			南瓜怪人	パンプジン	Gourgeist	幽灵	草
+#0712			冰宝	カチコール	Bergmite	冰
+#0713			冰岩怪	クレベース	Avalugg	冰
+#0713			冰岩怪
+洗翠的样子	クレベース	Avalugg	冰	岩石
+#0714			嗡蝠	オンバット	Noibat	飞行	龙
+#0715			音波龙	オンバーン	Noivern	飞行	龙
+#0716			哲尔尼亚斯	ゼルネアス	Xerneas	妖精
+#0717			伊裴尔塔尔	イベルタル	Yveltal	恶	飞行
+#0718			基格尔德	ジガルデ	Zygarde	龙	地面
+#0719			蒂安希	ディアンシー	Diancie	岩石	妖精
+#0720			胡帕	フーパ	Hoopa	超能力	幽灵
+#0721			波尔凯尼恩	ボルケニオン	Volcanion	火	水
+第七世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0722			木木枭	モクロー	Rowlet	草	飞行
+#0723			投羽枭	フクスロー	Dartrix	草	飞行
+#0724			狙射树枭	ジュナイパー	Decidueye	草	幽灵
+#0724			狙射树枭
+洗翠的样子	ジュナイパー	Decidueye	草	格斗
+#0725			火斑喵	ニャビー	Litten	火
+#0726			炎热喵	ニャヒート	Torracat	火
+#0727			炽焰咆哮虎	ガオガエン	Incineroar	火	恶
+#0728			球球海狮	アシマリ	Popplio	水
+#0729			花漾海狮	オシャマリ	Brionne	水
+#0730			西狮海壬	アシレーヌ	Primarina	水	妖精
+#0731			小笃儿	ツツケラ	Pikipek	一般	飞行
+#0732			喇叭啄鸟	ケララッパ	Trumbeak	一般	飞行
+#0733			铳嘴大鸟	ドデカバシ	Toucannon	一般	飞行
+#0734			猫鼬少	ヤングース	Yungoos	一般
+#0735			猫鼬探长	デカグース	Gumshoos	一般
+#0736			强颚鸡母虫	アゴジムシ	Grubbin	虫
+#0737			虫电宝	デンヂムシ	Charjabug	虫	电
+#0738			锹农炮虫	クワガノン	Vikavolt	虫	电
+#0739			好胜蟹	マケンカニ	Crabrawler	格斗
+#0740			好胜毛蟹	ケケンカニ	Crabominable	格斗	冰
+#0741			花舞鸟	オドリドリ	Oricorio	火	飞行
+#0742			萌虻	アブリー	Cutiefly	虫	妖精
+#0743			蝶结萌虻	アブリボン	Ribombee	虫	妖精
+#0744			岩狗狗	イワンコ	Rockruff	岩石
+#0745			鬃岩狼人	ルガルガン	Lycanroc	岩石
+#0746			弱丁鱼	ヨワシ	Wishiwashi	水
+#0747			好坏星	ヒドイデ	Mareanie	毒	水
+#0748			超坏星	ドヒドイデ	Toxapex	毒	水
+#0749			泥驴仔	ドロバンコ	Mudbray	地面
+#0750			重泥挽马	バンバドロ	Mudsdale	地面
+#0751			滴蛛	シズクモ	Dewpider	水	虫
+#0752			滴蛛霸	オニシズクモ	Araquanid	水	虫
+#0753			伪螳草	カリキリ	Fomantis	草
+#0754			兰螳花	ラランテス	Lurantis	草
+#0755			睡睡菇	ネマシュ	Morelull	草	妖精
+#0756			灯罩夜菇	マシェード	Shiinotic	草	妖精
+#0757			夜盗火蜥	ヤトウモリ	Salandit	毒	火
+#0758			焰后蜥	エンニュート	Salazzle	毒	火
+#0759			童偶熊	ヌイコグマ	Stufful	一般	格斗
+#0760			穿着熊	キテルグマ	Bewear	一般	格斗
+#0761			甜竹竹	アマカジ	Bounsweet	草
+#0762			甜舞妮	アママイコ	Steenee	草
+#0763			甜冷美后	アマージョ	Tsareena	草
+#0764			花疗环环	キュワワー	Comfey	妖精
+#0765			智挥猩	ヤレユータン	Oranguru	一般	超能力
+#0766			投掷猴	ナゲツケサル	Passimian	格斗
+#0767			胆小虫	コソクムシ	Wimpod	虫	水
+#0768			具甲武者	グソクムシャ	Golisopod	虫	水
+#0769			沙丘娃	スナバァ	Sandygast	幽灵	地面
+#0770			噬沙堡爷	シロデスナ	Palossand	幽灵	地面
+#0771			拳海参	ナマコブシ	Pyukumuku	水
+#0772			属性：空	タイプ：ヌル	Type: Null	一般
+#0773			银伴战兽	シルヴァディ	Silvally	一般
+#0774			小陨星	メテノ	Minior	岩石	飞行
+#0775			树枕尾熊	ネッコアラ	Komala	一般
+#0776			爆焰龟兽	バクガメス	Turtonator	火	龙
+#0777			托戈德玛尔	トゲデマル	Togedemaru	电	钢
+#0778			谜拟丘	ミミッキュ	Mimikyu	幽灵	妖精
+#0779			磨牙彩皮鱼	ハギギシリ	Bruxish	水	超能力
+#0780			老翁龙	ジジーロン	Drampa	一般	龙
+#0781			破破舵轮	ダダリン	Dhelmise	幽灵	草
+#0782			心鳞宝	ジャラコ	Jangmo-o	龙
+#0783			鳞甲龙	ジャランゴ	Hakamo-o	龙	格斗
+#0784			杖尾鳞甲龙	ジャラランガ	Kommo-o	龙	格斗
+#0785			卡璞・鸣鸣	カプ・コケコ	Tapu Koko	电	妖精
+#0786			卡璞・蝶蝶	カプ・テテフ	Tapu Lele	超能力	妖精
+#0787			卡璞・哞哞	カプ・ブルル	Tapu Bulu	草	妖精
+#0788			卡璞・鳍鳍	カプ・レヒレ	Tapu Fini	水	妖精
+#0789			科斯莫古	コスモッグ	Cosmog	超能力
+#0790			科斯莫姆	コスモウム	Cosmoem	超能力
+#0791			索尔迦雷欧	ソルガレオ	Solgaleo	超能力	钢
+#0792			露奈雅拉	ルナアーラ	Lunala	超能力	幽灵
+#0793			虚吾伊德	ウツロイド	Nihilego	岩石	毒
+#0794			爆肌蚊	マッシブーン	Buzzwole	虫	格斗
+#0795			费洛美螂	フェローチェ	Pheromosa	虫	格斗
+#0796			电束木	デンジュモク	Xurkitree	电
+#0797			铁火辉夜	テッカグヤ	Celesteela	钢	飞行
+#0798			纸御剑	カミツルギ	Kartana	草	钢
+#0799			恶食大王	アクジキング	Guzzlord	恶	龙
+#0800			奈克洛兹玛	ネクロズマ	Necrozma	超能力
+#0801			玛机雅娜	マギアナ	Magearna	钢	妖精
+#0802			玛夏多	マーシャドー	Marshadow	格斗	幽灵
+#0803			毒贝比	ベベノム	Poipole	毒
+#0804			四颚针龙	アーゴヨン	Naganadel	毒	龙
+#0805			垒磊石	ツンデツンデ	Stakataka	岩石	钢
+#0806			砰头小丑	ズガドーン	Blacephalon	火	幽灵
+#0807			捷拉奥拉	ゼラオラ	Zeraora	电
+#0808			美录坦	メルタン	Meltan	钢
+#0809			美录梅塔	メルメタル	Melmetal	钢
+第八世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0810			敲音猴	サルノリ	Grookey	草
+#0811			啪咚猴	バチンキー	Thwackey	草
+#0812			轰擂金刚猩	ゴリランダー	Rillaboom	草
+#0813			炎兔儿	ヒバニー	Scorbunny	火
+#0814			腾蹴小将	ラビフット	Raboot	火
+#0815			闪焰王牌	エースバーン	Cinderace	火
+#0816			泪眼蜥	メッソン	Sobble	水
+#0817			变涩蜥	ジメレオン	Drizzile	水
+#0818			千面避役	インテレオン	Inteleon	水
+#0819			贪心栗鼠	ホシガリス	Skwovet	一般
+#0820			藏饱栗鼠	ヨクバリス	Greedent	一般
+#0821			稚山雀	ココガラ	Rookidee	飞行
+#0822			蓝鸦	アオガラス	Corvisquire	飞行
+#0823			钢铠鸦	アーマーガア	Corviknight	飞行	钢
+#0824			索侦虫	サッチムシ	Blipbug	虫
+#0825			天罩虫	レドームシ	Dottler	虫	超能力
+#0826			以欧路普	イオルブ	Orbeetle	虫	超能力
+#0827			狡小狐	クスネ	Nickit	恶
+#0828			猾大狐	フォクスライ	Thievul	恶
+#0829			幼棉棉	ヒメンカ	Gossifleur	草
+#0830			白蓬蓬	ワタシラガ	Eldegoss	草
+#0831			毛辫羊	ウールー	Wooloo	一般
+#0832			毛毛角羊	バイウールー	Dubwool	一般
+#0833			咬咬龟	カムカメ	Chewtle	水
+#0834			暴噬龟	カジリガメ	Drednaw	水	岩石
+#0835			来电汪	ワンパチ	Yamper	电
+#0836			逐电犬	パルスワン	Boltund	电
+#0837			小炭仔	タンドン	Rolycoly	岩石
+#0838			大炭车	トロッゴン	Carkol	岩石	火
+#0839			巨炭山	セキタンザン	Coalossal	岩石	火
+#0840			啃果虫	カジッチュ	Applin	草	龙
+#0841			苹裹龙	アップリュー	Flapple	草	龙
+#0842			丰蜜龙	タルップル	Appletun	草	龙
+#0843			沙包蛇	スナヘビ	Silicobra	地面
+#0844			沙螺蟒	サダイジャ	Sandaconda	地面
+#0845			古月鸟	ウッウ	Cramorant	飞行	水
+#0846			刺梭鱼	サシカマス	Arrokuda	水
+#0847			戽斗尖梭	カマスジョー	Barraskewda	水
+#0848			电音婴	エレズン	Toxel	电	毒
+#0849			颤弦蝾螈	ストリンダー	Toxtricity	电	毒
+#0850			烧火蚣	ヤクデ	Sizzlipede	火	虫
+#0851			焚焰蚣	マルヤクデ	Centiskorch	火	虫
+#0852			拳拳蛸	タタッコ	Clobbopus	格斗
+#0853			八爪武师	オトスパス	Grapploct	格斗
+#0854			来悲茶	ヤバチャ	Sinistea	幽灵
+#0855			怖思壶	ポットデス	Polteageist	幽灵
+#0856			迷布莉姆	ミブリム	Hatenna	超能力
+#0857			提布莉姆	テブリム	Hattrem	超能力
+#0858			布莉姆温	ブリムオン	Hatterene	超能力	妖精
+#0859			捣蛋小妖	ベロバー	Impidimp	恶	妖精
+#0860			诈唬魔	ギモー	Morgrem	恶	妖精
+#0861			长毛巨魔	オーロンゲ	Grimmsnarl	恶	妖精
+#0862			堵拦熊	タチフサグマ	Obstagoon	恶	一般
+#0863			喵头目	ニャイキング	Perrserker	钢
+#0864			魔灵珊瑚	サニゴーン	Cursola	幽灵
+#0865			葱游兵	ネギガナイト	Sirfetch'd	格斗
+#0866			踏冰人偶	バリコオル	Mr. Rime	冰	超能力
+#0867			迭失板	デスバーン	Runerigus	地面	幽灵
+#0868			小仙奶	マホミル	Milcery	妖精
+#0869			霜奶仙	マホイップ	Alcremie	妖精
+#0870			列阵兵	タイレーツ	Falinks	格斗
+#0871			啪嚓海胆	バチンウニ	Pincurchin	电
+#0872			雪吞虫	ユキハミ	Snom	冰	虫
+#0873			雪绒蛾	モスノウ	Frosmoth	冰	虫
+#0874			巨石丁	イシヘンジン	Stonjourner	岩石
+#0875			冰砌鹅	コオリッポ	Eiscue	冰
+#0876			爱管侍	イエッサン	Indeedee	超能力	一般
+#0877			莫鲁贝可	モルペコ	Morpeko	电	恶
+#0878			铜象	ゾウドウ	Cufant	钢
+#0879			大王铜象	ダイオウドウ	Copperajah	钢
+#0880			雷鸟龙	パッチラゴン	Dracozolt	电	龙
+#0881			雷鸟海兽	パッチルドン	Arctozolt	电	冰
+#0882			鳃鱼龙	ウオノラゴン	Dracovish	水	龙
+#0883			鳃鱼海兽	ウオチルドン	Arctovish	水	冰
+#0884			铝钢龙	ジュラルドン	Duraludon	钢	龙
+#0885			多龙梅西亚	ドラメシヤ	Dreepy	龙	幽灵
+#0886			多龙奇	ドロンチ	Drakloak	龙	幽灵
+#0887			多龙巴鲁托	ドラパルト	Dragapult	龙	幽灵
+#0888			苍响	ザシアン	Zacian	妖精
+#0889			藏玛然特	ザマゼンタ	Zamazenta	格斗
+#0890			无极汰那	ムゲンダイナ	Eternatus	毒	龙
+#0891			熊徒弟	ダクマ	Kubfu	格斗
+#0892			武道熊师	ウーラオス	Urshifu	格斗	恶
+#0893			萨戮德	ザルード	Zarude	恶	草
+#0894			雷吉艾勒奇	レジエレキ	Regieleki	电
+#0895			雷吉铎拉戈	レジドラゴ	Regidrago	龙
+#0896			雪暴马	ブリザポス	Glastrier	冰
+#0897			灵幽马	レイスポス	Spectrier	幽灵
+#0898			蕾冠王	バドレックス	Calyrex	超能力	草
+#0899			诡角鹿	アヤシシ	Wyrdeer	一般	超能力
+#0900			劈斧螳螂	バサギリ	Kleavor	虫	岩石
+#0901			月月熊	ガチグマ	Ursaluna	地面	一般
+#0902			幽尾玄鱼	イダイトウ	Basculegion	水	幽灵
+#0903			大狃拉	オオニューラ	Sneasler	格斗	毒
+#0904			万针鱼	ハリーマン	Overqwil	恶	毒
+#0905			眷恋云	ラブトロス	Enamorus	妖精	飞行
+第九世代宝可梦
+编号	图像	宝可梦	属性
+中文	日文	英文
+#0906			新叶喵	ニャオハ	Sprigatito	草
+#0907			蒂蕾喵	ニャローテ	Floragato	草
+#0908			魔幻假面喵	マスカーニャ	Meowscarada	草	恶
+#0909			呆火鳄	ホゲータ	Fuecoco	火
+#0910			炙烫鳄	アチゲータ	Crocalor	火
+#0911			骨纹巨声鳄	ラウドボーン	Skeledirge	火	幽灵
+#0912			润水鸭	クワッス	Quaxly	水
+#0913			涌跃鸭	ウェルカモ	Quaxwell	水
+#0914			狂欢浪舞鸭	ウェーニバル	Quaquaval	水	格斗
+#0915			爱吃豚	グルトン	Lechonk	一般
+#0916			飘香豚	パフュートン	Oinkologne	一般
+#0917			团珠蛛	タマンチュラ	Tarountula	虫
+#0918			操陷蛛	ワナイダー	Spidops	虫
+#0919			豆蟋蟀	マメバッタ	Nymble	虫
+#0920			烈腿蝗	エクスレッグ	Lokix	虫	恶
+#0921			布拨	パモ	Pawmi	电
+#0922			布土拨	パモット	Pawmo	电	格斗
+#0923			巴布土拨	パーモット	Pawmot	电	格斗
+#0924			一对鼠	ワッカネズミ	Tandemaus	一般
+#0925			一家鼠	イッカネズミ	Maushold	一般
+#0926			狗仔包	パピモッチ	Fidough	妖精
+#0927			麻花犬	バウッツェル	Dachsbun	妖精
+#0928			迷你芙	ミニーブ	Smoliv	草	一般
+#0929			奥利纽	オリーニョ	Dolliv	草	一般
+#0930			奥利瓦	オリーヴァ	Arboliva	草	一般
+#0931			怒鹦哥	イキリンコ	Squawkabilly	一般	飞行
+#0932			盐石宝	コジオ	Nacli	岩石
+#0933			盐石垒	ジオヅム	Naclstack	岩石
+#0934			盐石巨灵	キョジオーン	Garganacl	岩石
+#0935			炭小侍	カルボウ	Charcadet	火
+#0936			红莲铠骑	グレンアルマ	Armarouge	火	超能力
+#0937			苍炎刃鬼	ソウブレイズ	Ceruledge	火	幽灵
+#0938			光蚪仔	ズピカ	Tadbulb	电
+#0939			电肚蛙	ハラバリー	Bellibolt	电
+#0940			电海燕	カイデン	Wattrel	电	飞行
+#0941			大电海燕	タイカイデン	Kilowattrel	电	飞行
+#0942			偶叫獒	オラチフ	Maschiff	恶
+#0943			獒教父	マフィティフ	Mabosstiff	恶
+#0944			滋汁鼹	シルシュルー	Shroodle	毒	一般
+#0945			涂标客	タギングル	Grafaiai	毒	一般
+#0946			纳噬草	アノクサ	Bramblin	草	幽灵
+#0947			怖纳噬草	アノホラグサ	Brambleghast	草	幽灵
+#0948			原野水母	ノノクラゲ	Toedscool	地面	草
+#0949			陆地水母	リククラゲ	Toedscruel	地面	草
+#0950			毛崖蟹	ガケガニ	Klawf	岩石
+#0951			热辣娃	カプサイジ	Capsakid	草
+#0952			狠辣椒	スコヴィラン	Scovillain	草	火
+#0953			虫滚泥	シガロコ	Rellor	虫
+#0954			虫甲圣	ベラカス	Rabsca	虫	超能力
+#0955			飘飘雏	ヒラヒナ	Flittle	超能力
+#0956			超能艳鸵	クエスパトラ	Espathra	超能力
+#0957			小锻匠	カヌチャン	Tinkatink	妖精	钢
+#0958			巧锻匠	ナカヌチャン	Tinkatuff	妖精	钢
+#0959			巨锻匠	デカヌチャン	Tinkaton	妖精	钢
+#0960			海地鼠	ウミディグダ	Wiglett	水
+#0961			三海地鼠	ウミトリオ	Wugtrio	水
+#0962			下石鸟	オトシドリ	Bombirdier	飞行	恶
+#0963			波普海豚	ナミイルカ	Finizen	水
+#0964			海豚侠	イルカマン	Palafin	水
+#0965			噗隆隆	ブロロン	Varoom	钢	毒
+#0966			普隆隆姆	ブロロローム	Revavroom	钢	毒
+#0967			摩托蜥	モトトカゲ	Cyclizar	龙	一般
+#0968			拖拖蚓	ミミズズ	Orthworm	钢
+#0969			晶光芽	キラーメ	Glimmet	岩石	毒
+#0970			晶光花	キラフロル	Glimmora	岩石	毒
+#0971			墓仔狗	ボチ	Greavard	幽灵
+#0972			墓扬犬	ハカドッグ	Houndstone	幽灵
+#0973			缠红鹤	カラミンゴ	Flamigo	飞行	格斗
+#0974			走鲸	アルクジラ	Cetoddle	冰
+#0975			浩大鲸	ハルクジラ	Cetitan	冰
+#0976			轻身鳕	ミガルーサ	Veluza	水	超能力
+#0977			吃吼霸	ヘイラッシャ	Dondozo	水
+#0978			米立龙	シャリタツ	Tatsugiri	龙	水
+#0979			弃世猴	コノヨザル	Annihilape	格斗	幽灵
+#0980			土王	ドオー	Clodsire	毒	地面
+#0981			奇麒麟	リキキリン	Farigiraf	一般	超能力
+#0982			土龙节节	ノココッチ	Dudunsparce	一般
+#0983			仆刀将军	ドドゲザン	Kingambit	恶	钢
+#0984			雄伟牙	イダイナキバ	Great Tusk	地面	格斗
+#0985			吼叫尾	サケブシッポ	Scream Tail	妖精	超能力
+#0986			猛恶菇	アラブルタケ	Brute Bonnet	草	恶
+#0987			振翼发	ハバタクカミ	Flutter Mane	幽灵	妖精
+#0988			爬地翅	チヲハウハネ	Slither Wing	虫	格斗
+#0989			沙铁皮	スナノケガワ	Sandy Shocks	电	地面
+#0990			铁辙迹	テツノワダチ	Iron Treads	地面	钢
+#0991			铁包袱	テツノツツミ	Iron Bundle	冰	水
+#0992			铁臂膀	テツノカイナ	Iron Hands	格斗	电
+#0993			铁脖颈	テツノコウベ	Iron Jugulis	恶	飞行
+#0994			铁毒蛾	テツノドクガ	Iron Moth	火	毒
+#0995			铁荆棘	テツノイバラ	Iron Thorns	岩石	电
+#0996			凉脊龙	セビエ	Frigibax	龙	冰
+#0997			冻脊龙	セゴール	Arctibax	龙	冰
+#0998			戟脊龙	セグレイブ	Baxcalibur	龙	冰
+#0999			索财灵	コレクレー	Gimmighoul	幽灵
+#1000			赛富豪	サーフゴー	Gholdengo	钢	幽灵
+#1001			古简蜗	チオンジェン	Wo-Chien	恶	草
+#1002			古剑豹	パオジアン	Chien-Pao	恶	冰
+#1003			古鼎鹿	ディンルー	Ting-Lu	恶	地面
+#1004			古玉鱼	イーユイ	Chi-Yu	恶	火
+#1005			轰鸣月	トドロクツキ	Roaring Moon	龙	恶
+#1006			铁武者	テツノブジン	Iron Valiant	妖精	格斗
+#1007			故勒顿	コライドン	Koraidon	格斗	龙
+#1008			密勒顿	ミライドン	Miraidon	电	龙
+#1009			波荡水	ウネルミナモ	Walking Wake	水	龙
+#1010			铁斑叶	テツノイサハ	Iron Leaves	草	超能力
+#1011			裹蜜虫	カミッチュ	Dipplin	草	龙
+#1012			斯魔茶	チャデス	Poltchageist	草	幽灵
+#1013			来悲粗茶	ヤバソチャ	Sinistcha	草	幽灵
+#1014			够赞狗	イイネイヌ	Okidogi	毒	格斗
+#1015			愿增猿	マシマシラ	Munkidori	毒	超能力
+#1016			吉雉鸡	キチキギス	Fezandipiti	毒	妖精
+#1017			厄诡椪	オーガポン	Ogerpon	草
+#1018			铝钢桥龙	ブリジュラス	Archaludon	钢	龙
+#1019			蜜集大蛇	カミツオロチ	Hydrapple	草	龙
+#1020			破空焰	ウガツホムラ	Gouging Fire	火	龙
+#1021			猛雷鼓	タケルライコ	Raging Bolt	电	龙
+#1022			铁磐岩	テツノイワオ	Iron Boulder	岩石	超能力
+#1023			铁头壳	テツノカシラ	Iron Crown	钢	超能力
+#1024			太乐巴戈斯	テラパゴス	Terapagos	一般
+#1025			桃歹郎	モモワロウ	Pecharunt	毒	幽灵

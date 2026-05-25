@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>队伍状态</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1318;
+      --panel: #171d26;
+      --panel2: #1e2736;
+      --line: #2a3344;
+      --text: #edf2f7;
+      --muted: #8a9bb0;
+      --accent: #4ec9a0;
+      --gold: #f5c842;
+      --danger: #e8606a;
+      --blue: #6ba8ff;
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(78,201,160,.15), transparent 40rem),
+        linear-gradient(155deg, #0f1318 0%, #131a24 50%, #0f1318 100%);
+      color: var(--text);
+    }
+    [v-cloak] { display: none; }
+
+    .shell { width: min(1380px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 40px; }
+    .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: clamp(24px, 4vw, 40px); line-height: 1.1; }
+    .subtitle { margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .pills { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: rgba(23,29,38,.7); color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); flex-shrink: 0; transition: background .3s; }
+    .dot.live { background: var(--accent); box-shadow: 0 0 0 3px rgba(78,201,160,.22); }
+    .error-bar { margin-bottom: 14px; padding: 11px 14px; border: 1px solid rgba(232,96,106,.35); border-radius: 8px; background: rgba(232,96,106,.1); color: #ffd6d8; font-size: 13px; }
+    .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    .left-pane { min-width: 0; }
+    .right-pane { min-width: 0; }
+    .right-placeholder { height: 100%; min-height: 500px; border: 1px dashed var(--line); border-radius: 12px; display: grid; place-items: center; color: #4a5870; background: rgba(18,24,33,.35); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+    .card { position: relative; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(180deg, rgba(30,39,54,.97), rgba(20,26,36,.98)); overflow: hidden; box-shadow: 0 18px 44px rgba(0,0,0,.3); }
+    .card.empty { min-height: 220px; display: grid; place-items: center; background: rgba(18,24,33,.5); box-shadow: none; color: #4a5870; }
+    .empty-inner { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .empty-ring { width: 52px; height: 52px; border-radius: 50%; border: 1px dashed #38485e; display: grid; place-items: center; font-size: 20px; }
+    .slot-bg { position: absolute; top: 8px; right: 12px; font-size: 52px; font-weight: 800; line-height: 1; color: rgba(255,255,255,.045); pointer-events: none; user-select: none; }
+    .card-body { position: relative; padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 11px; }
+
+    .card-header { display: flex; gap: 12px; align-items: center; }
+    .sprite-wrap { flex-shrink: 0; width: 68px; height: 68px; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(135deg, rgba(78,201,160,.28), rgba(107,168,255,.2)); border: 1px solid rgba(255,255,255,.07); overflow: hidden; }
+    .sprite-img { width: 60px; height: 60px; object-fit: contain; image-rendering: pixelated; }
+    .sprite-fallback { font-size: 24px; font-weight: 800; color: rgba(255,255,255,.8); letter-spacing: -1px; }
+    .header-info { min-width: 0; flex: 1; }
+    .name-row { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+    .species-name { font-size: 20px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .level-badge { flex-shrink: 0; font-size: 14px; font-weight: 800; color: var(--gold); }
+    .meta-line { margin-top: 4px; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .hp-section { display: grid; gap: 5px; }
+    .hp-label-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .hp-track { height: 8px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: hidden; }
+    .hp-fill { height: 100%; border-radius: inherit; transition: width 200ms ease, background 200ms ease; min-width: 2px; }
+    .hp-fill.hp-full { background: linear-gradient(90deg, #4ec9a0, #8de8c8); }
+    .hp-fill.hp-warn { background: linear-gradient(90deg, #f0b840, #f8d27d); }
+    .hp-fill.hp-crit { background: linear-gradient(90deg, #e8606a, #f29ea4); }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; }
+    .stat-row { display: grid; grid-template-columns: 28px 1fr 36px 26px; align-items: center; gap: 4px; }
+    .stat-lbl { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .stat-track { height: 5px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: visible; position: relative; }
+    .stat-ev-tip { position: absolute; left: 50%; top: -26px; transform: translateX(-50%); background: rgba(14,20,30,.97); border: 1px solid var(--line); border-radius: 5px; padding: 2px 7px; font-size: 11px; color: var(--text); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 20; }
+    .stat-row:hover .stat-ev-tip { opacity: 1; }
+    .stat-fill { height: 100%; border-radius: inherit; min-width: 2px; }
+    .stat-fill.ev-zero { background: rgba(255,255,255,.1); }
+    .stat-fill.ev-low  { background: linear-gradient(90deg, #5a6e8a, #7a8fa8); }
+    .stat-fill.ev-mid  { background: linear-gradient(90deg, var(--blue), #a5c8ff); }
+    .stat-fill.ev-high { background: linear-gradient(90deg, #5bc8a0, #9ae8cc); }
+    .stat-fill.ev-max  { background: linear-gradient(90deg, var(--gold), #ffe07a); }
+    .stat-val { font-size: 12px; font-weight: 700; text-align: right; tabular-nums; }
+    .ev-chip { font-size: 10px; padding: 1px 3px; border-radius: 4px; text-align: center; white-space: nowrap; }
+    .ev-chip.ev-zero { background: rgba(90,110,138,.15); border: 1px solid rgba(90,110,138,.25); color: #5a6880; }
+    .ev-chip.ev-low  { background: rgba(180,140,100,.18); border: 1px solid rgba(180,140,100,.3); color: #c8a86a; }
+    .ev-chip.ev-mid  { background: rgba(220,160,60,.18);  border: 1px solid rgba(220,160,60,.3);  color: #e0b84a; }
+    .ev-chip.ev-high { background: rgba(240,180,40,.2);   border: 1px solid rgba(240,180,40,.35); color: #f5cc50; }
+    .ev-chip.ev-max  { background: rgba(245,200,66,.22);  border: 1px solid rgba(245,200,66,.4);  color: #fada6a; }
+    .iv-chip { font-size: 10px; padding: 1px 3px; border-radius: 4px; text-align: center; white-space: nowrap; }
+    .iv-chip.iv-low  { background: rgba(90,110,138,.22); border: 1px solid rgba(90,110,138,.35); color: #8a9bb0; }
+    .iv-chip.iv-mid  { background: rgba(107,168,255,.15); border: 1px solid rgba(107,168,255,.28); color: #a5c8ff; }
+    .iv-chip.iv-high { background: rgba(91,200,160,.18); border: 1px solid rgba(91,200,160,.32); color: #7de6c2; }
+    .iv-chip.iv-max  { background: rgba(245,200,66,.18); border: 1px solid rgba(245,200,66,.35); color: #fada6a; }
+
+    .moves-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .move-chip { min-height: 30px; padding: 6px 8px; border-radius: 7px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .move-chip.has-move { background: rgba(107,168,255,.1); border: 1px solid rgba(107,168,255,.2); color: #cde0ff; }
+    .move-chip.no-move  { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); color: #3e5068; }
+
+    .details { display: grid; gap: 5px; padding-top: 2px; border-top: 1px solid rgba(255,255,255,.06); }
+    .detail-row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+    .detail-row .lbl { color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .detail-row .val { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+
+    @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 660px)  { .shell { width: calc(100% - 20px); } }
+  </style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <h1>队伍状态</h1>
+        <div class="subtitle">{{ partyCount }}/6 · {{ gameCode || 'GBA' }}</div>
+      </div>
+      <div class="pills">
+        <div class="pill"><span class="dot" :class="{ live: online }"></span>{{ online ? '实时' : '等待' }}</div>
+        <div class="pill">{{ timeText }}</div>
+      </div>
+    </div>
+
+    <div class="error-bar" v-if="error">{{ error }}</div>
+
+    <div class="main-layout">
+      <div class="left-pane">
+        <div class="grid">
+          <div v-for="s in slots" :key="s.index" class="card" :class="{ empty: !s.mon }">
+            <template v-if="s.mon">
+              <div class="slot-bg">{{ s.index }}</div>
+              <div class="card-body">
+
+                <div class="card-header">
+                  <div class="sprite-wrap">
+                    <img class="sprite-img" :src="spriteUrl(s.mon)" :alt="t('species', s.mon.speciesName)"
+                         @error="imgErrors[s.index] = true" v-show="!imgErrors[s.index]">
+                    <span class="sprite-fallback" v-show="imgErrors[s.index]">{{ initials(s.mon) }}</span>
+                  </div>
+                  <div class="header-info">
+                    <div class="name-row">
+                      <div class="species-name">{{ displayName(s.mon) }}</div>
+                      <div class="level-badge">Lv&thinsp;{{ s.mon.level }}</div>
+                    </div>
+                    <div class="meta-line" v-if="s.mon.nickname && s.mon.nickname !== s.mon.speciesName">{{ s.mon.nickname }}</div>
+                  </div>
+                </div>
+
+                <div class="hp-section">
+                  <div class="hp-label-row"><span>HP</span><span>{{ s.mon.hp }} / {{ s.mon.maxHP }}</span></div>
+                  <div class="hp-track">
+                    <div class="hp-fill" :class="hpCls(s.mon)" :style="{ width: hpPct(s.mon) + '%' }"></div>
+                  </div>
+                </div>
+
+                <div class="stats-grid">
+                  <div class="stat-row" v-for="st in statRows(s.mon)" :key="st.key">
+                    <span class="stat-lbl">{{ st.label }}</span>
+                    <div class="stat-track">
+                      <div class="stat-fill" :class="evFillCls(st.ev)" :style="{ width: st.pct + '%' }"></div>
+                      <span class="stat-ev-tip">EV {{ st.ev }} / 252</span>
+                    </div>
+                    <span class="stat-val">{{ st.val }}</span>
+                    <span class="iv-chip" :class="ivFillCls(st.iv)">{{ st.iv }}</span>
+                  </div>
+                </div>
+
+                <div class="moves-grid">
+                  <div v-for="(m, i) in displayMoves(s.mon)" :key="i" class="move-chip" :class="m ? 'has-move' : 'no-move'">
+                    {{ m || '—' }}
+                  </div>
+                </div>
+
+                <div class="details">
+                  <div class="detail-row"><span class="lbl">特性</span><span class="val">{{ displayAbility(s.mon) }}</span></div>
+                  <div class="detail-row"><span class="lbl">道具</span><span class="val">{{ displayItem(s.mon) }}</span></div>
+                  <div class="detail-row"><span class="lbl">遇见</span><span class="val">{{ displayLocation(s.mon) }}</span></div>
+                </div>
+
+              </div>
+            </template>
+            <template v-else>
+              <div class="empty-inner">
+                <div class="empty-ring">{{ s.index }}</div>
+                <span style="font-size:13px">空位</span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      <div class="right-pane">
+        <div class="right-placeholder">
+          <span style="font-size:13px;opacity:.4">待接入面板</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+  data() {
+    return {
+      payload: null,
+      receivedAt: null,
+      error: '',
+      online: false,
+      translations: { species: {}, moves: {}, abilities: {}, items: {} },
+      imgErrors: {},
+      prevSpeciesKey: '',
+    };
+  },
+
+  computed: {
+    party()      { return this.payload?.party ?? []; },
+    partyCount() { return this.party.length; },
+    gameCode()   { return this.payload?.gameCode ?? ''; },
+    timeText() {
+      if (!this.receivedAt) return '尚未接收';
+      return new Date(this.receivedAt).toLocaleTimeString('zh-CN', { hour12: false });
+    },
+    slots() {
+      return Array.from({ length: 6 }, (_, i) => ({
+        index: i + 1,
+        mon: this.party.find((m) => m.slot === i + 1) ?? null,
+      }));
+    },
+  },
+
+  mounted() {
+    this.loadTranslations();
+    this.refresh();
+    setInterval(this.refresh, 1000);
+  },
+
+  methods: {
+    // ── translation ────────────────────────────────────────────────────────
+    async loadTranslations() {
+      try {
+        const res = await fetch('/meta/translations', { cache: 'force-cache' });
+        if (res.ok) this.translations = await res.json();
+      } catch { /* translations unavailable, fall back to English */ }
+    },
+
+    t(category, englishName) {
+      if (!englishName) return null;
+      return this.translations[category]?.[englishName] || englishName;
+    },
+
+    // ── party data ─────────────────────────────────────────────────────────
+    async refresh() {
+      try {
+        const res = await fetch('/status', { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.status === 404 ? '等待 mGBA 连接' : 'HTTP ' + res.status);
+        const body = await res.json();
+
+        const speciesKey = (body.data?.party ?? []).map((m) => `${m.slot}:${m.species}`).join(',');
+        if (speciesKey !== this.prevSpeciesKey) {
+          this.imgErrors = {};
+          this.prevSpeciesKey = speciesKey;
+        }
+
+        this.payload = body.data;
+        this.receivedAt = body.receivedAt;
+        this.error = '';
+        this.online = true;
+      } catch (e) {
+        this.online = false;
+        this.error = e.message;
+      }
+    },
+
+    // ── display helpers ────────────────────────────────────────────────────
+    spriteUrl(mon) {
+      const species = this.spriteSlug(mon.speciesName || '');
+      const form = this.spriteSlug(mon.formName || '');
+      const slug = form ? `${species}-${form}` : species;
+      return `https://www.diving-fish.com/showdown/sprites/${slug}.png`;
+    },
+
+    spriteSlug(value) {
+      return String(value || '').toLowerCase()
+        .replace(/♀/g, '-f').replace(/♂/g, '-m')
+        .replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    },
+
+    displayName(mon) {
+      return this.t('species', mon.speciesName) || '#' + mon.species;
+    },
+
+    initials(mon) {
+      const n = this.displayName(mon);
+      return n.slice(0, Math.min(2, n.length));
+    },
+
+    hpPct(mon)  { return mon.maxHP ? Math.min(100, Math.round(mon.hp / mon.maxHP * 100)) : 0; },
+    hpCls(mon)  { const p = this.hpPct(mon); return p > 50 ? 'hp-full' : p > 25 ? 'hp-warn' : 'hp-crit'; },
+
+    ivFillCls(iv) {
+      if (iv === '?' || iv == null) return 'iv-low';
+      if (iv === 31) return 'iv-max';
+      if (iv >= 26)  return 'iv-high';
+      if (iv >= 16)  return 'iv-mid';
+      return 'iv-low';
+    },
+
+    evFillCls(ev) {
+      if (!ev)        return 'ev-zero';
+      if (ev >= 252)  return 'ev-max';
+      if (ev >= 128)  return 'ev-high';
+      if (ev >= 64)   return 'ev-mid';
+      return 'ev-low';
+    },
+
+    statRows(mon) {
+      const s = mon.stats || {}, iv = mon.ivs || {}, ev = mon.evs || {};
+      const rows = [
+        { key: 'atk', label: '攻击', val: s.attack    ?? 0, ev: ev.attack    ?? 0, iv: iv.attack    ?? '?' },
+        { key: 'def', label: '防御', val: s.defense   ?? 0, ev: ev.defense   ?? 0, iv: iv.defense   ?? '?' },
+        { key: 'spa', label: '特攻', val: s.spAttack  ?? 0, ev: ev.spAttack  ?? 0, iv: iv.spAttack  ?? '?' },
+        { key: 'spd', label: '特防', val: s.spDefense ?? 0, ev: ev.spDefense ?? 0, iv: iv.spDefense ?? '?' },
+        { key: 'spe', label: '速度', val: s.speed     ?? 0, ev: ev.speed     ?? 0, iv: iv.speed     ?? '?' },
+        { key: 'hp',  label: 'HP',   val: mon.maxHP   ?? 0, ev: ev.hp        ?? 0, iv: iv.hp        ?? '?' },
+      ];
+      rows.forEach((r) => { r.pct = Math.min(100, Math.round(r.ev / 252 * 100)); });
+      return rows;
+    },
+
+    displayMoves(mon) {
+      const en = mon.moveNames ?? [];
+      return Array.from({ length: 4 }, (_, i) => this.t('moves', en[i]) || null);
+    },
+
+    displayAbility(mon) {
+      return this.t('abilities', mon.abilityName) || '—';
+    },
+
+    displayItem(mon) {
+      if (!mon.heldItem) return '无';
+      return this.t('items', mon.heldItemName) || mon.heldItemName || '#' + mon.heldItem;
+    },
+
+    displayLocation(mon) {
+      const loc = mon.metLocationNameZh || mon.metMapsecNameZh;
+      const lv  = mon.metLevel ? ' Lv' + mon.metLevel : '';
+      return (loc || '#' + (mon.metMapsec ?? mon.metLocation ?? '?')) + lv;
+    },
+  },
+}).mount('#app');
+</script>
+</body>
+</html>
