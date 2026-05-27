@@ -4,22 +4,45 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OBS Party</title>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link href="https://fonts.loli.net/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.5.13/vue.global.prod.js"></script>
   <style>
+    @font-face {
+      font-family: 'Zpix';
+      src: url('https://cdn.jsdelivr.net/gh/SolidZORO/zpix-pixel-font@latest/dist/Zpix.ttf') format('truetype');
+      font-display: swap;
+    }
+
     :root {
-      color-scheme: dark;
-      --hp-high: #45d66f;
-      --hp-mid: #f2c84b;
-      --hp-low: #e65757;
-      --bar-bg: rgba(255, 255, 255, .14);
-      --frame-border: rgba(255, 255, 255, .2);
-      --frame-glow: rgba(112, 194, 255, .18);
-      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      color-scheme: light;
+      --ink: #1b2d4f;
+      --ink-mid: #2d4376;
+      --ink-soft: #5b6c8e;
+      --ink-deep: #0c1530;
+      --paper: #fffcef;
+      --paper-2: #fff8df;
+      --paper-shadow: #ede4c4;
+      --crimson: #dc0a2d;
+      --crimson-deep: #a40020;
+      --crimson-bg: #ffe2e6;
+      --gold: #f6c544;
+      --gold-deep: #c9941b;
+      --gold-bg: #fff5d6;
+      --leaf: #51a85d;
+      --leaf-deep: #2f7a3c;
+      --hp-high: #51a85d;
+      --hp-high-deep: #2f7a3c;
+      --hp-mid: #f6c544;
+      --hp-mid-deep: #c9941b;
+      --hp-low: #dc0a2d;
+      --hp-low-deep: #a40020;
+      --font-head: 'Press Start 2P', 'Silkscreen', monospace;
+      --font-body: 'Zpix', 'Silkscreen', 'Microsoft YaHei', sans-serif;
     }
 
     * { box-sizing: border-box; }
-    html,
-    body {
+
+    html, body {
       margin: 0;
       width: 100%;
       min-height: 100%;
@@ -29,158 +52,359 @@
 
     body {
       display: inline-block;
+      font-family: var(--font-body);
     }
 
     [v-cloak] { display: none; }
 
     .overlay {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 12px;
+      padding-bottom: 18px;
       width: 610px;
+      height: 700px;
+      box-sizing: border-box;
       background: transparent;
     }
 
+    .party-frame { flex: 0 0 auto; }
+
+    .dead-frame {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ============== DIALOG FRAME (GBA paper + navy border) ============== */
     .pixel-frame {
       position: relative;
-      border: 1px solid var(--frame-border);
-      border-radius: 14px;
-      background:
-        linear-gradient(145deg, rgba(28, 38, 48, .72), rgba(9, 13, 17, .52)),
-        radial-gradient(circle at 18% 0%, rgba(112, 194, 255, .16), transparent 140px);
-      box-shadow:
-        0 18px 38px rgba(0, 0, 0, .32),
-        inset 0 1px 0 rgba(255, 255, 255, .16),
-        inset 0 -1px 0 rgba(0, 0, 0, .4);
+      background: var(--paper);
+      border: 4px solid var(--ink);
+      border-radius: 16px;
       padding: 6px;
-      overflow: hidden;
-      backdrop-filter: blur(6px);
+      box-shadow:
+        0 5px 0 0 var(--ink-soft),
+        0 8px 14px rgba(0, 0, 0, 0.25);
     }
 
     .pixel-frame::after {
-      content: "";
+      content: '';
       position: absolute;
-      inset: 1px;
-      border-radius: 13px;
-      border: 1px solid rgba(255, 255, 255, .06);
+      inset: 3px;
+      border: 2px dashed rgba(27, 45, 79, 0.16);
+      border-radius: 11px;
       pointer-events: none;
     }
 
+    /* Pokeball corner mark */
+    .frame-mark {
+      position: absolute;
+      top: -10px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      z-index: 3;
+      filter: drop-shadow(2px 3px 0 rgba(27, 45, 79, 0.35));
+    }
+
+    /* ============== PARTY GRID ============== */
     .party-grid {
       display: grid;
-      grid-template-columns: repeat(6, 96px);
-      grid-template-rows: 108px;
+      grid-template-columns: repeat(6, 1fr);
       gap: 4px;
-      width: 604px;
-      background: transparent;
+      position: relative;
+      z-index: 1;
     }
 
     .slot {
       position: relative;
-      width: 96px;
-      height: 108px;
+      height: 116px;
       display: grid;
       justify-items: center;
       align-items: start;
+      background: linear-gradient(180deg, #ffffff 0%, var(--paper-2) 100%);
+      border: 2.5px solid var(--ink);
       border-radius: 10px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .01));
+      box-shadow: inset 0 -3px 0 rgba(27, 45, 79, 0.08);
+      overflow: hidden;
+    }
+
+    .slot.empty {
+      background:
+        repeating-linear-gradient(45deg, transparent 0, transparent 6px, rgba(27, 45, 79, 0.05) 6px, rgba(27, 45, 79, 0.05) 12px),
+        var(--paper-2);
+      border: 2.5px dashed var(--ink-soft);
+      box-shadow: none;
+    }
+
+    .slot.dead {
+      background: linear-gradient(180deg, var(--crimson-bg) 0%, #ffd6db 100%);
+      border-color: var(--crimson);
+      box-shadow: inset 0 -3px 0 rgba(220, 10, 45, 0.18);
+    }
+
+    .slot-num {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 18px;
+      height: 18px;
+      background: var(--gold);
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      font-family: var(--font-head);
+      font-size: 9px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      z-index: 2;
+      box-shadow: 0 2px 0 0 var(--ink);
+    }
+
+    .slot.dead .slot-num {
+      background: var(--crimson);
+      color: #fffcef;
     }
 
     .sprite {
-      width: 96px;
-      height: 96px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
       image-rendering: pixelated;
-      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .82))
-              drop-shadow(0 5px 7px rgba(0, 0, 0, .62));
+      image-rendering: crisp-edges;
+      filter: drop-shadow(2px 3px 0 rgba(27, 45, 79, 0.28));
+      margin-top: 4px;
     }
 
     .slot.dead .sprite {
-      filter: grayscale(1) opacity(.55)
-              drop-shadow(0 2px 0 rgba(0, 0, 0, .82))
-              drop-shadow(0 5px 7px rgba(0, 0, 0, .62));
+      filter: grayscale(1) opacity(.55) drop-shadow(2px 3px 0 rgba(27, 45, 79, 0.28));
     }
 
+    /* ============== HP BAR (GBA battle style) ============== */
     .hp-wrap {
       position: absolute;
-      left: 8px;
-      right: 8px;
-      bottom: 8px;
-      height: 8px;
-      padding: 0;
-      border: 1px solid rgba(255, 255, 255, .22);
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      height: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 2;
+    }
+
+    .hp-label {
+      font-family: var(--font-head);
+      font-size: 7px;
+      letter-spacing: 0.5px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .hp-bar {
+      flex: 1;
+      height: 10px;
+      background: var(--paper-shadow);
+      border: 2px solid var(--ink);
       border-radius: 999px;
-      background: var(--bar-bg);
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 255, 255, .08);
       overflow: hidden;
+      box-shadow:
+        inset 0 2px 0 rgba(0, 0, 0, 0.12),
+        0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .hp-fill {
       height: 100%;
       width: 0;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #35bf61, var(--hp-high));
-      transition: width 120ms linear, background 120ms linear;
+      background: var(--hp-high);
+      box-shadow: inset 0 -2px 0 var(--hp-high-deep);
+      transition: width 200ms linear, background 200ms linear;
     }
 
-    .hp-fill.mid { background: linear-gradient(90deg, #d89f2f, var(--hp-mid)); }
-    .hp-fill.low { background: linear-gradient(90deg, #c93e47, var(--hp-low)); }
-    .hp-fill.empty { width: 0 !important; }
+    .hp-fill.mid {
+      background: var(--hp-mid);
+      box-shadow: inset 0 -2px 0 var(--hp-mid-deep);
+    }
 
+    .hp-fill.low {
+      background: var(--hp-low);
+      box-shadow: inset 0 -2px 0 var(--hp-low-deep);
+      animation: critical-pulse 0.55s ease-in-out infinite alternate;
+    }
+
+    .hp-fill.empty {
+      width: 0 !important;
+      animation: none;
+    }
+
+    @keyframes critical-pulse {
+      from { filter: brightness(1);   }
+      to   { filter: brightness(1.35); }
+    }
+
+    /* ============== DEAD GRID ============== */
     .dead-grid {
       display: grid;
-      grid-template-columns: repeat(6, 96px);
-      grid-template-rows: repeat(5, 96px);
-      grid-auto-rows: 96px;
+      grid-template-columns: repeat(6, 1fr);
       gap: 4px;
-      width: 604px;
-      max-height: 496px;
-      overflow: hidden;
-      background: transparent;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      align-content: start;
+      position: relative;
+      z-index: 1;
+      padding-right: 4px;
+      /* Pokeball-themed scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: var(--crimson) var(--paper-shadow);
+    }
+
+    .dead-grid::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .dead-grid::-webkit-scrollbar-track {
+      background: var(--paper-shadow);
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      margin: 2px 0;
+      box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .dead-grid::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--crimson) 0%, var(--crimson) 50%, #fffcef 50%, #fffcef 100%);
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    .dead-grid::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, var(--crimson-deep) 0%, var(--crimson-deep) 50%, #fffcef 50%, #fffcef 100%);
     }
 
     .dead-slot {
+      position: relative;
       display: grid;
       place-items: center;
-      width: 96px;
-      height: 96px;
+      aspect-ratio: 1;
+      background: linear-gradient(180deg, var(--crimson-bg) 0%, #ffd6db 100%);
+      border: 2.5px solid var(--crimson);
       border-radius: 10px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(0, 0, 0, .08));
+      box-shadow: inset 0 -3px 0 rgba(220, 10, 45, 0.2);
+      overflow: hidden;
+    }
+
+    .dead-slot::after {
+      content: '✕';
+      position: absolute;
+      top: 2px;
+      right: 5px;
+      color: var(--crimson-deep);
+      font-family: var(--font-head);
+      font-size: 11px;
+      line-height: 1;
+      opacity: 0.85;
+      z-index: 2;
     }
 
     .dead-sprite {
-      width: 96px;
-      height: 96px;
+      width: 82px;
+      height: 82px;
       object-fit: contain;
       image-rendering: pixelated;
-      filter: grayscale(1) opacity(.7)
-              drop-shadow(0 2px 0 rgba(0, 0, 0, .82));
+      image-rendering: crisp-edges;
+      filter: grayscale(1) opacity(.62) drop-shadow(1px 2px 0 rgba(27, 45, 79, 0.32));
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Empty dead grid placeholder (in case no deaths) */
+    .dead-empty {
+      grid-column: 1 / -1;
+      min-height: 80px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-body);
+      font-size: 18px;
+      color: var(--ink-soft);
+      padding: 16px;
     }
   </style>
 </head>
 <body>
 <div id="app" v-cloak>
   <div class="overlay">
-    <div class="pixel-frame">
+
+    <!-- ============ PARTY FRAME ============ -->
+    <div class="pixel-frame party-frame">
+      <!-- Pokeball corner mark -->
+      <svg class="frame-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="28" fill="#fffcef" stroke="#1b2d4f" stroke-width="5"/>
+        <path d="M4 32 a28 28 0 0 1 56 0 Z" fill="#dc0a2d" stroke="#1b2d4f" stroke-width="5"/>
+        <line x1="6" y1="32" x2="58" y2="32" stroke="#1b2d4f" stroke-width="5"/>
+        <circle cx="32" cy="32" r="8" fill="#fffcef" stroke="#1b2d4f" stroke-width="5"/>
+        <circle cx="32" cy="32" r="3" fill="#1b2d4f"/>
+      </svg>
+
       <div class="party-grid">
-        <div v-for="slot in slots" :key="slot.index" class="slot" :class="{ dead: slot.mon?.dead }">
+        <div
+          v-for="slot in slots"
+          :key="slot.index"
+          class="slot"
+          :class="{ dead: slot.mon?.dead, empty: !slot.mon }"
+        >
+          <span class="slot-num">{{ slot.index }}</span>
           <template v-if="slot.mon">
-            <img class="sprite" :src="spriteUrl(slot.mon)" :alt="slot.mon.speciesName || slot.mon.species">
+            <img
+              class="sprite"
+              :src="spriteUrl(slot.mon)"
+              :alt="slot.mon.speciesName || slot.mon.species"
+            >
             <div class="hp-wrap">
-              <div class="hp-fill" :class="hpClass(slot.mon)" :style="{ width: hpPct(slot.mon) + '%' }"></div>
+              <span class="hp-label">HP</span>
+              <div class="hp-bar">
+                <div
+                  class="hp-fill"
+                  :class="hpClass(slot.mon)"
+                  :style="{ width: hpPct(slot.mon) + '%' }"
+                ></div>
+              </div>
             </div>
           </template>
         </div>
       </div>
     </div>
 
-    <div class="pixel-frame">
+    <!-- ============ DEAD FRAME ============ -->
+    <div class="pixel-frame dead-frame">
+      <!-- Crimson Pokeball corner mark (faded) -->
+      <svg class="frame-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="28" fill="#fffcef" stroke="#1b2d4f" stroke-width="5"/>
+        <path d="M4 32 a28 28 0 0 1 56 0 Z" fill="#a40020" stroke="#1b2d4f" stroke-width="5"/>
+        <line x1="6" y1="32" x2="58" y2="32" stroke="#1b2d4f" stroke-width="5"/>
+        <circle cx="32" cy="32" r="8" fill="#fffcef" stroke="#1b2d4f" stroke-width="5"/>
+        <text x="32" y="36" text-anchor="middle" font-family="Press Start 2P, monospace" font-size="9" fill="#1b2d4f">X</text>
+      </svg>
+
       <div class="dead-grid">
-        <div v-for="mon in visibleDeadPokemon" :key="mon.nuzlockeKey || mon.personality || mon.species" class="dead-slot">
-          <img class="dead-sprite" :src="spriteUrl(mon)" :alt="mon.speciesName || mon.species">
+        <div
+          v-for="mon in visibleDeadPokemon"
+          :key="mon.nuzlockeKey || mon.personality || mon.species"
+          class="dead-slot"
+        >
+          <img
+            class="dead-sprite"
+            :src="spriteUrl(mon)"
+            :alt="mon.speciesName || mon.species"
+          >
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -204,7 +428,7 @@ createApp({
     },
 
     visibleDeadPokemon() {
-      return this.deadPokemon.slice(0, 30);
+      return this.deadPokemon;
     },
   },
 
