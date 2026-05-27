@@ -277,6 +277,7 @@ createApp({
 
     // ── display helpers ────────────────────────────────────────────────────
     spriteUrl(mon) {
+      if (mon.spriteUrl) return mon.spriteUrl;
       const species = this.spriteSlug(mon.speciesName || '');
       const form = this.spriteSlug(mon.formName || '');
       const slug = form ? `${species}-${form}` : species;

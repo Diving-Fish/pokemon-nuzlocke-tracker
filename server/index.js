@@ -8,6 +8,9 @@ const TCP_PORT = Number(process.env.TCP_PORT || 8765);
 const ROOT_DIR = __dirname;
 const PROJECT_ROOT = path.resolve(ROOT_DIR, '..');
 const DASHBOARD_PATH = path.join(ROOT_DIR, 'public', 'dashboard.html');
+const NUZLOCKE_PATH = path.join(ROOT_DIR, 'public', 'nuzlocke.html');
+const OBS_PATH = path.join(ROOT_DIR, 'public', 'obs.html');
+const NUZLOCKE_STATE_PATH = path.join(PROJECT_ROOT, '.game', 'nuzlocke-state.json');
 
 const ADAPTERS = new Map([
   ['radical-red', require(path.join(PROJECT_ROOT, 'adapters', 'radical-red'))],
@@ -23,6 +26,11 @@ function loadJsonFile(filePath, fallback) {
     if (error.code !== 'ENOENT') console.warn(`[server] failed to load ${filePath}: ${error.message}`);
     return fallback;
   }
+}
+
+function saveJsonFile(filePath, payload) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf8');
 }
 
 function readText(relativePath) {
@@ -44,7 +52,7 @@ function getAdapter(adapterId = DEFAULT_ADAPTER_ID) {
 function getAdapterContext(adapterId = DEFAULT_ADAPTER_ID) {
   const adapter = getAdapter(adapterId);
   if (!adapterCache.has(adapter.id)) {
-    const data = loadJsonFile(adapter.dataPath, {});
+    const data = typeof adapter.loadData === 'function' ? adapter.loadData() : loadJsonFile(adapter.dataPath, {});
     const translations = buildTranslations(data);
     adapterCache.set(adapter.id, {
       adapter,
@@ -59,6 +67,39 @@ function getAdapterContext(adapterId = DEFAULT_ADAPTER_ID) {
     });
   }
   return adapterCache.get(adapter.id);
+}
+
+function spriteSlug(value) {
+  return String(value || '').toLowerCase()
+    .replace(/♀/g, '-f')
+    .replace(/♂/g, '-m')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function defaultSpriteUrl(mon) {
+  const species = spriteSlug(mon.speciesName || '');
+  const form = spriteSlug(mon.formName || '');
+  const slug = form ? `${species}-${form}` : species;
+  return `https://www.diving-fish.com/showdown/sprites/${slug}.png`;
+}
+
+function localSpriteUrl(adapterId, speciesId) {
+  if (speciesId == null) return null;
+  return `/sprite?adapterId=${encodeURIComponent(adapterId)}&species=${encodeURIComponent(speciesId)}`;
+}
+
+function sendPngDataUri(res, dataUri) {
+  const match = /^data:image\/png;base64,(.+)$/i.exec(dataUri || '');
+  if (!match) return false;
+  res.writeHead(200, {
+    'content-type': 'image/png',
+    'cache-control': 'public, max-age=31536000, immutable',
+    'access-control-allow-origin': '*',
+  });
+  res.end(Buffer.from(match[1], 'base64'));
+  return true;
 }
 
 // ── name helpers ──────────────────────────────────────────────────────────────
@@ -151,7 +192,7 @@ function resolveAbility(mon, speciesRecord, data) {
   return { abilityId: abilityId || null, abilityName, abilityCandidates };
 }
 
-function enrichMon(mon, data) {
+function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID) {
   const speciesRecord = lookupById(data.species, mon.species);
   const speciesName   = getRecordName(speciesRecord);
   const speciesKey    = speciesRecord?.key || speciesName || null;
@@ -178,16 +219,17 @@ function enrichMon(mon, data) {
     abilityId:         ability.abilityId,
     abilityName:       ability.abilityName,
     abilityCandidates: ability.abilityCandidates,
+    spriteUrl:          localSpriteUrl(adapterId, mon.species) || defaultSpriteUrl({ speciesName, formName: formSuffix }),
   };
 }
 
-function enrichPc(pc, data) {
+function enrichPc(pc, data, adapterId = DEFAULT_ADAPTER_ID) {
   if (!pc || !Array.isArray(pc.boxes)) return pc ?? null;
   return {
     ...pc,
     boxes: pc.boxes.map((box) => ({
       ...box,
-      pokemon: Array.isArray(box.pokemon) ? box.pokemon.map((mon) => enrichMon(mon, data)) : [],
+      pokemon: Array.isArray(box.pokemon) ? box.pokemon.map((mon) => enrichMon(mon, data, adapterId)) : [],
     })),
   };
 }
@@ -198,8 +240,139 @@ function enrichStatus(payload) {
   return {
     ...payload,
     adapterId: context.adapter.id,
-    party: payload.party.map((mon) => enrichMon(mon, context.data)),
-    pc: enrichPc(payload.pc, context.data),
+    party: payload.party.map((mon) => enrichMon(mon, context.data, context.adapter.id)),
+    pc: enrichPc(payload.pc, context.data, context.adapter.id),
+  };
+}
+
+// ---- Nuzlocke state --------------------------------------------------------
+
+function createNuzlockeState() {
+  return { version: 1, mons: {}, locationLimits: {} };
+}
+
+function loadNuzlockeState() {
+  const state = loadJsonFile(NUZLOCKE_STATE_PATH, createNuzlockeState());
+  return {
+    version: 1,
+    mons: state.mons && typeof state.mons === 'object' ? state.mons : {},
+    locationLimits: state.locationLimits && typeof state.locationLimits === 'object' ? state.locationLimits : {},
+  };
+}
+
+let nuzlockeState = loadNuzlockeState();
+
+function persistNuzlockeState() {
+  saveJsonFile(NUZLOCKE_STATE_PATH, nuzlockeState);
+}
+
+function monIdentity(mon, adapterId = DEFAULT_ADAPTER_ID) {
+  if (mon?.personality != null) return `${adapterId}:personality:${mon.personality}`;
+  const location = mon?.metMapsec ?? mon?.metLocation ?? 'unknown';
+  const place = mon?.slot ? `party:${mon.slot}` : `box:${mon?.box ?? '?'}:${mon?.position ?? '?'}`;
+  return `${adapterId}:fallback:${mon?.species ?? '?'}:${location}:${place}`;
+}
+
+function locationKey(mon) {
+  const location = mon?.metMapsec ?? mon?.metLocation;
+  return location == null ? null : `mapsec:${location}`;
+}
+
+function locationLabel(mon) {
+  const fallback = mon?.metMapsec ?? mon?.metLocation;
+  return mon?.metLocationNameZh || mon?.metMapsecNameZh || (fallback == null ? null : `区域 #${fallback}`);
+}
+
+function collectPokemon(status) {
+  const adapterId = status?.adapterId || DEFAULT_ADAPTER_ID;
+  const party = Array.isArray(status?.party)
+    ? status.party.map((mon) => ({ ...mon, source: 'party', sourceLabel: `随行 ${mon.slot ?? ''}`.trim() }))
+    : [];
+  const boxed = [];
+  for (const box of status?.pc?.boxes || []) {
+    for (const mon of box.pokemon || []) {
+      boxed.push({ ...mon, source: 'box', sourceLabel: `盒子 ${mon.box ?? box.index ?? '?'}-${mon.position ?? '?'}` });
+    }
+  }
+  return [...party, ...boxed].map((mon) => {
+    const key = monIdentity(mon, adapterId);
+    return { ...mon, nuzlockeKey: key };
+  });
+}
+
+function syncNuzlockeMon(mon) {
+  const now = new Date().toISOString();
+  const hp = Number.isFinite(mon.hp) ? mon.hp : null;
+  const record = nuzlockeState.mons[mon.nuzlockeKey] || { dead: false, previousHp: null };
+  if (hp === 0 && (record.previousHp == null || record.previousHp > 0)) {
+    record.dead = true;
+    record.updatedAt = now;
+  }
+  if (hp != null) record.previousHp = hp;
+  record.species = mon.speciesName || mon.species || record.species || null;
+  record.nickname = mon.nickname || record.nickname || null;
+  nuzlockeState.mons[mon.nuzlockeKey] = record;
+  mon.dead = Boolean(record.dead);
+  return mon;
+}
+
+function applyNuzlockeState(status) {
+  if (!status) return status;
+  let changed = false;
+  for (const mon of collectPokemon(status)) {
+    const before = JSON.stringify(nuzlockeState.mons[mon.nuzlockeKey] || null);
+    syncNuzlockeMon(mon);
+    const after = JSON.stringify(nuzlockeState.mons[mon.nuzlockeKey] || null);
+    changed = changed || before !== after;
+  }
+  const applyToMon = (mon) => {
+    const key = monIdentity(mon, status.adapterId || DEFAULT_ADAPTER_ID);
+    const record = nuzlockeState.mons[key];
+    mon.nuzlockeKey = key;
+    mon.dead = Boolean(record?.dead);
+    return mon;
+  };
+  status.party = Array.isArray(status.party) ? status.party.map(applyToMon) : [];
+  if (status.pc?.boxes) {
+    status.pc.boxes = status.pc.boxes.map((box) => ({
+      ...box,
+      pokemon: Array.isArray(box.pokemon) ? box.pokemon.map(applyToMon) : [],
+    }));
+  }
+  if (changed) persistNuzlockeState();
+  return status;
+}
+
+function buildNuzlockeView(status) {
+  if (!status) return null;
+  const pokemon = collectPokemon(status).map((mon) => syncNuzlockeMon(mon));
+  const locationMap = new Map();
+  for (const mon of pokemon) {
+    const key = locationKey(mon);
+    const label = locationLabel(mon);
+    if (!key || !label) continue;
+    if (!locationMap.has(key)) {
+      const limit = Math.max(0, Number(nuzlockeState.locationLimits[key] ?? 1) || 0);
+      locationMap.set(key, { key, label, limit, pokemon: [] });
+    }
+    locationMap.get(key).pokemon.push(mon);
+  }
+
+  const locations = Array.from(locationMap.values())
+    .map((location) => ({
+      ...location,
+      count: location.pokemon.length,
+      overLimit: location.pokemon.length > location.limit,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'));
+
+  persistNuzlockeState();
+  return {
+    adapterId: status.adapterId,
+    gameCode: status.gameCode,
+    frame: status.frame,
+    pokemon,
+    locations,
   };
 }
 
@@ -209,7 +382,7 @@ let latestStatus = null;
 let latestReceivedAt = null;
 
 function acceptParty(payload) {
-  latestStatus = enrichStatus(payload);
+  latestStatus = applyNuzlockeState(enrichStatus(payload));
   latestReceivedAt = new Date().toISOString();
   const summary = latestStatus.party
     .map((m) => `${m.slot}:${m.speciesName || m.species} Lv${m.level}`)
@@ -268,6 +441,9 @@ const httpServer = http.createServer(async (req, res) => {
       latestReceivedAt,
       endpoints: {
         dashboard:    'GET  /dashboard',
+        nuzlocke:     'GET  /nuzlocke',
+        nuzlockeData: 'GET  /nuzlocke/status',
+        obs:          'GET  /obs',
         status:       'GET  /status',
         latest:       'GET  /party/latest',
         receive:      'POST /party',
@@ -275,6 +451,24 @@ const httpServer = http.createServer(async (req, res) => {
         health:       'GET  /health',
       },
     });
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/nuzlocke') {
+    try {
+      sendHtml(res, 200, fs.readFileSync(NUZLOCKE_PATH, 'utf8'));
+    } catch {
+      sendJson(res, 500, { ok: false, error: 'nuzlocke.html not found' });
+    }
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/obs') {
+    try {
+      sendHtml(res, 200, fs.readFileSync(OBS_PATH, 'utf8'));
+    } catch {
+      sendJson(res, 500, { ok: false, error: 'obs.html not found' });
+    }
     return;
   }
 
@@ -302,6 +496,73 @@ const httpServer = http.createServer(async (req, res) => {
         'cache-control': 'public, max-age=3600',
       });
       res.end(context.translationsJson);
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+    }
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/sprite') {
+    try {
+      const adapterId = url.searchParams.get('adapterId') || latestStatus?.adapterId || DEFAULT_ADAPTER_ID;
+      const speciesId = url.searchParams.get('species');
+      const context = getAdapterContext(adapterId);
+      const sprite = typeof context.adapter.getSprite === 'function'
+        ? context.adapter.getSprite(speciesId)
+        : null;
+      if (sprite && sendPngDataUri(res, sprite)) return;
+
+      const speciesRecord = lookupById(context.data.species, Number(speciesId));
+      const speciesName = getRecordName(speciesRecord) || url.searchParams.get('speciesName') || '';
+      const speciesKey = speciesRecord?.key || speciesName;
+      const formName = speciesKey && speciesName && speciesKey !== speciesName
+        ? speciesKey.slice(speciesName.length).replace(/^-/, '') || ''
+        : (url.searchParams.get('formName') || '');
+      const fallback = defaultSpriteUrl({ speciesName, formName });
+      res.writeHead(302, { location: fallback, 'cache-control': 'public, max-age=3600' });
+      res.end();
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+    }
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/nuzlocke/status') {
+    if (!latestStatus) {
+      sendJson(res, 404, { ok: false, error: 'No status received yet' });
+      return;
+    }
+    sendJson(res, 200, { ok: true, receivedAt: latestReceivedAt, data: buildNuzlockeView(latestStatus) });
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/nuzlocke/mon') {
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      if (!body.key || typeof body.dead !== 'boolean') throw new Error('Expected { key, dead }');
+      const now = new Date().toISOString();
+      nuzlockeState.mons[body.key] = {
+        ...(nuzlockeState.mons[body.key] || {}),
+        dead: body.dead,
+        updatedAt: now,
+      };
+      persistNuzlockeState();
+      if (latestStatus) applyNuzlockeState(latestStatus);
+      sendJson(res, 200, { ok: true });
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+    }
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/nuzlocke/location-limit') {
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      const limit = Number(body.limit);
+      if (!body.key || !Number.isFinite(limit) || limit < 0) throw new Error('Expected { key, limit >= 0 }');
+      nuzlockeState.locationLimits[body.key] = Math.floor(limit);
+      persistNuzlockeState();
+      sendJson(res, 200, { ok: true });
     } catch (error) {
       sendJson(res, 400, { ok: false, error: error.message });
     }

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OBS Party</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --hp-high: #45d66f;
+      --hp-mid: #f2c84b;
+      --hp-low: #e65757;
+      --bar-bg: rgba(255, 255, 255, .14);
+      --frame-border: rgba(255, 255, 255, .2);
+      --frame-glow: rgba(112, 194, 255, .18);
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    body {
+      display: inline-block;
+    }
+
+    [v-cloak] { display: none; }
+
+    .overlay {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      width: 610px;
+      background: transparent;
+    }
+
+    .pixel-frame {
+      position: relative;
+      border: 1px solid var(--frame-border);
+      border-radius: 14px;
+      background:
+        linear-gradient(145deg, rgba(28, 38, 48, .72), rgba(9, 13, 17, .52)),
+        radial-gradient(circle at 18% 0%, rgba(112, 194, 255, .16), transparent 140px);
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, .32),
+        inset 0 1px 0 rgba(255, 255, 255, .16),
+        inset 0 -1px 0 rgba(0, 0, 0, .4);
+      padding: 6px;
+      overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+
+    .pixel-frame::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 13px;
+      border: 1px solid rgba(255, 255, 255, .06);
+      pointer-events: none;
+    }
+
+    .party-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 96px);
+      grid-template-rows: 108px;
+      gap: 4px;
+      width: 604px;
+      background: transparent;
+    }
+
+    .slot {
+      position: relative;
+      width: 96px;
+      height: 108px;
+      display: grid;
+      justify-items: center;
+      align-items: start;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .01));
+    }
+
+    .sprite {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .82))
+              drop-shadow(0 5px 7px rgba(0, 0, 0, .62));
+    }
+
+    .slot.dead .sprite {
+      filter: grayscale(1) opacity(.55)
+              drop-shadow(0 2px 0 rgba(0, 0, 0, .82))
+              drop-shadow(0 5px 7px rgba(0, 0, 0, .62));
+    }
+
+    .hp-wrap {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      height: 8px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 999px;
+      background: var(--bar-bg);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 255, 255, .08);
+      overflow: hidden;
+    }
+
+    .hp-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #35bf61, var(--hp-high));
+      transition: width 120ms linear, background 120ms linear;
+    }
+
+    .hp-fill.mid { background: linear-gradient(90deg, #d89f2f, var(--hp-mid)); }
+    .hp-fill.low { background: linear-gradient(90deg, #c93e47, var(--hp-low)); }
+    .hp-fill.empty { width: 0 !important; }
+
+    .dead-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 96px);
+      grid-template-rows: repeat(5, 96px);
+      grid-auto-rows: 96px;
+      gap: 4px;
+      width: 604px;
+      max-height: 496px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .dead-slot {
+      display: grid;
+      place-items: center;
+      width: 96px;
+      height: 96px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(0, 0, 0, .08));
+    }
+
+    .dead-sprite {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: grayscale(1) opacity(.7)
+              drop-shadow(0 2px 0 rgba(0, 0, 0, .82));
+    }
+  </style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <div class="overlay">
+    <div class="pixel-frame">
+      <div class="party-grid">
+        <div v-for="slot in slots" :key="slot.index" class="slot" :class="{ dead: slot.mon?.dead }">
+          <template v-if="slot.mon">
+            <img class="sprite" :src="spriteUrl(slot.mon)" :alt="slot.mon.speciesName || slot.mon.species">
+            <div class="hp-wrap">
+              <div class="hp-fill" :class="hpClass(slot.mon)" :style="{ width: hpPct(slot.mon) + '%' }"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <div class="pixel-frame">
+      <div class="dead-grid">
+        <div v-for="mon in visibleDeadPokemon" :key="mon.nuzlockeKey || mon.personality || mon.species" class="dead-slot">
+          <img class="dead-sprite" :src="spriteUrl(mon)" :alt="mon.speciesName || mon.species">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+  data() {
+    return {
+      party: [],
+      deadPokemon: [],
+    };
+  },
+
+  computed: {
+    slots() {
+      return Array.from({ length: 6 }, (_, index) => ({
+        index: index + 1,
+        mon: this.party.find((mon) => mon.slot === index + 1) || null,
+      }));
+    },
+
+    visibleDeadPokemon() {
+      return this.deadPokemon.slice(0, 30);
+    },
+  },
+
+  mounted() {
+    this.refresh();
+    setInterval(this.refresh, 750);
+  },
+
+  methods: {
+    async refresh() {
+      try {
+        const res = await fetch('/status', { cache: 'no-store' });
+        if (res.ok) {
+          const body = await res.json();
+          this.party = body.data?.party || [];
+        }
+      } catch {
+        /* Keep the last visible party for OBS stability. */
+      }
+
+      try {
+        const res = await fetch('/nuzlocke/status', { cache: 'no-store' });
+        if (!res.ok) return;
+        const body = await res.json();
+        this.deadPokemon = (body.data?.pokemon || []).filter((mon) => mon.dead);
+      } catch {
+        /* Death data is optional for the OBS overlay. */
+      }
+    },
+
+    hpPct(mon) {
+      if (!mon.maxHP) return 0;
+      return Math.max(0, Math.min(100, Math.round((mon.hp || 0) / mon.maxHP * 100)));
+    },
+
+    hpClass(mon) {
+      const pct = this.hpPct(mon);
+      if (pct <= 0) return 'empty low';
+      if (pct <= 25) return 'low';
+      if (pct <= 50) return 'mid';
+      return '';
+    },
+
+    spriteUrl(mon) {
+      if (mon.spriteUrl) return mon.spriteUrl;
+      const species = this.spriteSlug(mon.speciesName || '');
+      const form = this.spriteSlug(mon.formName || '');
+      const slug = form ? `${species}-${form}` : species;
+      return `https://www.diving-fish.com/showdown/sprites/${slug}.png`;
+    },
+
+    spriteSlug(value) {
+      return String(value || '').toLowerCase()
+        .replace(/♀/g, '-f')
+        .replace(/♂/g, '-m')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    },
+  },
+}).mount('#app');
+</script>
+</body>
+</html>

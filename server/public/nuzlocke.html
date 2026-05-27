@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nuzlocke</title>
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@3.6.15/dist/vuetify.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@3.6.15/dist/vuetify.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101418;
+      --panel: #171d23;
+      --panel-strong: #202832;
+      --line: #303a46;
+      --line-soft: #242d37;
+      --text: #eef3f8;
+      --muted: #94a1af;
+      --accent: #4cc38a;
+      --blue: #67a8f5;
+      --danger: #e3626b;
+      --danger-bg: rgba(227, 98, 107, .13);
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    [v-cloak] { display: none; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #101418 0%, #141a20 54%, #0f1419 100%);
+      color: var(--text);
+    }
+
+    .v-application {
+      background: transparent;
+      color: var(--text);
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    .shell {
+      width: min(1440px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 36px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .subline {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .roll-tool {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 24px;
+      min-height: 34px;
+      padding: 4px 6px 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(23, 29, 35, .78);
+    }
+
+    .roll-input {
+      width: 72px;
+    }
+
+    .roll-input input {
+      text-align: right;
+    }
+
+    .roll-input .v-field {
+      background: #0f151b;
+      border-radius: 7px;
+    }
+
+    .roll-result {
+      min-width: 32px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
+      text-align: center;
+      tab-size: 4;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(23, 29, 35, .78);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--danger);
+      flex: 0 0 auto;
+    }
+
+    .dot.live {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(76, 195, 138, .18);
+    }
+
+    .error-bar {
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(227, 98, 107, .4);
+      border-radius: 8px;
+      background: var(--danger-bg);
+      color: #ffd9dc;
+      font-size: 13px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, .92fr) minmax(420px, 1.08fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .pane {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(23, 29, 35, .88);
+      overflow: visible;
+    }
+
+    .pane-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(32, 40, 50, .72);
+    }
+
+    .pane-title {
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .pane-stat {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .pokemon-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+      gap: 8px;
+      padding: 10px;
+      overflow: visible;
+    }
+
+    .mon-tile {
+      position: relative;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #131a20;
+      cursor: context-menu;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      overflow: hidden;
+    }
+
+    .mon-tile:hover {
+      transform: translateY(-1px);
+      border-color: rgba(103, 168, 245, .55);
+      background: #18212a;
+    }
+
+    .mon-tile.party {
+      border-color: rgba(76, 195, 138, .45);
+      background: linear-gradient(180deg, rgba(76, 195, 138, .12), rgba(19, 26, 32, .96));
+    }
+
+    .mon-tile.dead {
+      border-color: rgba(227, 98, 107, .6);
+      background: linear-gradient(180deg, rgba(227, 98, 107, .14), rgba(19, 26, 32, .98));
+    }
+
+    .sprite {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .28));
+    }
+
+    .dead .sprite,
+    .mini-sprite.dead {
+      filter: grayscale(1) opacity(.56);
+    }
+
+    .fallback {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .06);
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .source-badge,
+    .dead-badge {
+      position: absolute;
+      display: inline-grid;
+      place-items: center;
+      height: 18px;
+      min-width: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1;
+      z-index: 1;
+    }
+
+    .source-badge {
+      left: 5px;
+      top: 5px;
+      background: rgba(76, 195, 138, .2);
+      border: 1px solid rgba(76, 195, 138, .32);
+      color: #9be8c2;
+    }
+
+    .dead-badge {
+      right: 5px;
+      top: 5px;
+      background: rgba(227, 98, 107, .23);
+      border: 1px solid rgba(227, 98, 107, .38);
+      color: #ffbec4;
+    }
+
+    .v-tooltip > .v-overlay__content.mon-tooltip {
+      width: min(280px, calc(100vw - 24px));
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(13, 18, 23, .98);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .42);
+      color: var(--text);
+      opacity: 1;
+      line-height: 1.4;
+      font-size: 12px;
+    }
+
+    .v-tooltip > .v-overlay__content.mon-tooltip::before {
+      display: none;
+    }
+
+    .tip-name {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+      font-weight: 800;
+    }
+
+    .tip-name span:first-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tip-grid {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .tip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .tip-row .label {
+      color: #9aa8b8;
+      white-space: nowrap;
+    }
+
+    .tip-row .value {
+      color: var(--text);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .location-list {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .location-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px 96px;
+      gap: 12px;
+      align-items: center;
+      min-height: 58px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #131a20;
+    }
+
+    .location-row.over {
+      border-color: rgba(227, 98, 107, .62);
+      background: var(--danger-bg);
+    }
+
+    .loc-title {
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .loc-mons {
+      display: flex;
+      gap: 4px;
+      min-width: 0;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+
+    .mini-sprite {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .count strong {
+      color: var(--text);
+      font-size: 18px;
+    }
+
+    .over .count strong {
+      color: #ffbec4;
+    }
+
+    .limit-input {
+      width: 84px;
+    }
+
+    .limit-input input {
+      text-align: right;
+    }
+
+    .limit-input .v-field {
+      background: #0f151b;
+      border-radius: 7px;
+    }
+
+    .empty {
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      color: #566476;
+      font-size: 13px;
+    }
+
+    .context-menu {
+      position: fixed;
+      z-index: 200;
+      min-width: 140px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(13, 18, 23, .98);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .45);
+    }
+
+    .menu-item {
+      width: 100%;
+      min-height: 32px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      padding: 0 9px;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .menu-item:hover {
+      background: rgba(103, 168, 245, .14);
+    }
+
+    @media (max-width: 920px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: calc(100% - 20px); padding-top: 18px; }
+      .pokemon-list { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+      .location-row { grid-template-columns: minmax(0, 1fr) 64px 84px; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div id="app" v-cloak @click="closeMenu">
+  <v-app>
+    <main class="shell">
+      <div class="topbar">
+        <div>
+          <h1>Nuzlocke</h1>
+          <div class="subline">{{ totalCount }} 只 · {{ gameCode || 'GBA' }}</div>
+        </div>
+        <div class="top-actions">
+          <div class="roll-tool" @click.stop>
+            <v-text-field
+              class="roll-input"
+              density="compact"
+              hide-details
+              single-line
+              variant="outlined"
+              type="number"
+              min="1"
+              step="1"
+              v-model.number="rollMax"
+              @keydown.enter="rollDice"
+            ></v-text-field>
+            <v-btn
+              density="comfortable"
+              size="small"
+              variant="tonal"
+              color="primary"
+              :disabled="rolling"
+              @click="rollDice"
+            >
+              <v-progress-circular v-if="rolling" indeterminate size="16" width="2"></v-progress-circular>
+              <span v-else>Roll</span>
+            </v-btn>
+            <span class="roll-result">{{ rolling ? '-' : (rollResult || '-') }}</span>
+          </div>
+          <div class="pills">
+            <div class="pill"><span class="dot" :class="{ live: online }"></span>{{ online ? '实时' : '等待' }}</div>
+            <div class="pill">{{ timeText }}</div>
+            <div class="pill">死亡 {{ deadCount }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-bar" v-if="error">{{ error }}</div>
+
+      <div class="layout">
+        <section class="pane">
+          <div class="pane-head">
+            <div class="pane-title">宝可梦</div>
+            <div class="pane-stat">同行优先</div>
+          </div>
+
+          <div class="pokemon-list" v-if="pokemon.length">
+            <v-tooltip
+              v-for="mon in pokemon"
+              :key="mon.nuzlockeKey"
+              content-class="mon-tooltip"
+              location="top"
+              open-delay="120"
+              close-delay="70"
+            >
+              <template #activator="{ props }">
+                <div
+                  v-bind="props"
+                  class="mon-tile"
+                  :class="{ party: mon.source === 'party', dead: mon.dead }"
+                  @contextmenu.prevent.stop="openMenu($event, mon)"
+                >
+                  <span class="source-badge" v-if="mon.source === 'party'">{{ mon.slot }}</span>
+                  <span class="dead-badge" v-if="mon.dead">DEAD</span>
+                  <img
+                    v-if="!imgErrors[mon.nuzlockeKey]"
+                    class="sprite"
+                    :src="spriteUrl(mon)"
+                    :alt="displayName(mon)"
+                    @error="imgErrors[mon.nuzlockeKey] = true"
+                  >
+                  <span v-else class="fallback">{{ initials(mon) }}</span>
+                </div>
+              </template>
+
+              <div>
+                <div class="tip-name">
+                  <span>{{ displayName(mon) }}</span>
+                  <span>{{ levelText(mon) }}</span>
+                </div>
+                <div class="tip-grid">
+                  <div class="tip-row"><span class="label">状态</span><span class="value">{{ mon.dead ? '死亡' : '存活' }}</span></div>
+                  <div class="tip-row"><span class="label">HP</span><span class="value">{{ hpText(mon) }}</span></div>
+                  <div class="tip-row"><span class="label">性格</span><span class="value">{{ mon.natureNameZh || mon.natureName || '未知' }}</span></div>
+                  <div class="tip-row"><span class="label">特性</span><span class="value">{{ displayAbility(mon) }}</span></div>
+                  <div class="tip-row"><span class="label">携带</span><span class="value">{{ displayItem(mon) }}</span></div>
+                  <div class="tip-row"><span class="label">遇见</span><span class="value">{{ locationText(mon) }}</span></div>
+                  <div class="tip-row"><span class="label">位置</span><span class="value">{{ mon.sourceLabel }}</span></div>
+                </div>
+              </div>
+            </v-tooltip>
+          </div>
+          <div class="empty" v-else>等待宝可梦数据</div>
+        </section>
+
+        <section class="pane">
+          <div class="pane-head">
+            <div class="pane-title">区域捕捉</div>
+            <div class="pane-stat">{{ overLimitCount }} 个超限</div>
+          </div>
+
+          <div class="location-list" v-if="locations.length">
+            <div v-for="loc in locations" :key="loc.key" class="location-row" :class="{ over: loc.overLimit }">
+              <div>
+                <div class="loc-title">{{ loc.label }}</div>
+                <div class="loc-mons">
+                  <img
+                    v-for="mon in loc.pokemon"
+                    :key="mon.nuzlockeKey"
+                    class="mini-sprite"
+                    :class="{ dead: mon.dead }"
+                    :src="spriteUrl(mon)"
+                    :title="displayName(mon)"
+                    :alt="displayName(mon)"
+                  >
+                </div>
+              </div>
+              <div class="count"><strong>{{ loc.count }}</strong> / {{ loc.limit }}</div>
+              <v-text-field
+                class="limit-input"
+                density="compact"
+                hide-details
+                single-line
+                variant="outlined"
+                type="number"
+                min="0"
+                step="1"
+                :model-value="loc.limit"
+                @blur="setLimit(loc.key, $event.target.value)"
+                @keydown.enter="$event.target.blur()"
+              ></v-text-field>
+            </div>
+          </div>
+          <div class="empty" v-else>暂无区域记录</div>
+        </section>
+      </div>
+    </main>
+
+    <div
+      v-if="menu.mon"
+      class="context-menu"
+      :style="{ left: menu.x + 'px', top: menu.y + 'px' }"
+      @click.stop
+    >
+      <button class="menu-item" @click="setDead(menu.mon, !menu.mon.dead)">
+        {{ menu.mon.dead ? '复活' : '标记死亡' }}
+      </button>
+    </div>
+  </v-app>
+</div>
+
+<script>
+const { createApp } = Vue;
+const vuetify = Vuetify.createVuetify({
+  theme: {
+    defaultTheme: 'dark',
+    themes: {
+      dark: {
+        dark: true,
+        colors: {
+          background: '#101418',
+          surface: '#171d23',
+          primary: '#67a8f5',
+          error: '#e3626b',
+        },
+      },
+    },
+  },
+});
+
+createApp({
+  data() {
+    return {
+      view: null,
+      receivedAt: null,
+      error: '',
+      online: false,
+      translations: { species: {}, abilities: {}, items: {} },
+      imgErrors: {},
+      menu: { mon: null, x: 0, y: 0 },
+      rollMax: 6,
+      rollResult: null,
+      rolling: false,
+      rollTimer: null,
+    };
+  },
+
+  computed: {
+    pokemon() { return this.view?.pokemon ?? []; },
+    locations() { return this.view?.locations ?? []; },
+    gameCode() { return this.view?.gameCode ?? ''; },
+    totalCount() { return this.pokemon.length; },
+    deadCount() { return this.pokemon.filter((mon) => mon.dead).length; },
+    overLimitCount() { return this.locations.filter((loc) => loc.overLimit).length; },
+    timeText() {
+      if (!this.receivedAt) return '尚未接收';
+      return new Date(this.receivedAt).toLocaleTimeString('zh-CN', { hour12: false });
+    },
+  },
+
+  mounted() {
+    this.loadTranslations();
+    this.refresh();
+    setInterval(this.refresh, 1000);
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') this.closeMenu();
+    });
+  },
+
+  methods: {
+    async loadTranslations() {
+      try {
+        const res = await fetch('/meta/translations', { cache: 'force-cache' });
+        if (res.ok) this.translations = await res.json();
+      } catch {
+        /* translation data is optional */
+      }
+    },
+
+    t(category, englishName) {
+      if (!englishName) return null;
+      return this.translations[category]?.[englishName] || englishName;
+    },
+
+    async refresh() {
+      try {
+        const res = await fetch('/nuzlocke/status', { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.status === 404 ? '等待 mGBA 连接' : 'HTTP ' + res.status);
+        const body = await res.json();
+        this.view = body.data;
+        this.receivedAt = body.receivedAt;
+        this.online = true;
+        this.error = '';
+      } catch (error) {
+        this.online = false;
+        this.error = error.message;
+      }
+    },
+
+    async setDead(mon, dead) {
+      await fetch('/nuzlocke/mon', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ key: mon.nuzlockeKey, dead }),
+      });
+      this.closeMenu();
+      await this.refresh();
+    },
+
+    async setLimit(key, value) {
+      const limit = Math.max(0, Math.floor(Number(value) || 0));
+      await fetch('/nuzlocke/location-limit', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ key, limit }),
+      });
+      await this.refresh();
+    },
+
+    openMenu(event, mon) {
+      this.menu = {
+        mon,
+        x: Math.min(event.clientX, window.innerWidth - 156),
+        y: Math.min(event.clientY, window.innerHeight - 52),
+      };
+    },
+
+    closeMenu() {
+      this.menu.mon = null;
+    },
+
+    rollDice() {
+      if (this.rolling) return;
+      const max = Math.floor(Number(this.rollMax));
+      if (!Number.isFinite(max) || max < 1) {
+        this.rollMax = 1;
+      } else {
+        this.rollMax = max;
+      }
+
+      this.rolling = true;
+      window.clearTimeout(this.rollTimer);
+      this.rollTimer = window.setTimeout(() => {
+        this.rollResult = Math.floor(Math.random() * this.rollMax) + 1;
+        this.rolling = false;
+      }, 1000);
+    },
+
+    displayName(mon) {
+      return this.t('species', mon.speciesName) || ('#' + mon.species);
+    },
+
+    initials(mon) {
+      const name = this.displayName(mon);
+      return name.slice(0, Math.min(2, name.length));
+    },
+
+    levelText(mon) {
+      return mon.level ? 'Lv ' + mon.level : '';
+    },
+
+    displayAbility(mon) {
+      return this.t('abilities', mon.abilityName) || '未知';
+    },
+
+    displayItem(mon) {
+      if (!mon.heldItem) return '无';
+      return this.t('items', mon.heldItemName) || mon.heldItemName || ('#' + mon.heldItem);
+    },
+
+    hpText(mon) {
+      if (mon.hp == null || mon.maxHP == null) return '盒中';
+      return mon.hp + ' / ' + mon.maxHP;
+    },
+
+    locationText(mon) {
+      const label = mon.metLocationNameZh || mon.metMapsecNameZh;
+      const raw = mon.metMapsec ?? mon.metLocation;
+      const level = mon.metLevel ? ' Lv ' + mon.metLevel : '';
+      return (label || (raw == null ? '未知' : '区域 #' + raw)) + level;
+    },
+
+    spriteUrl(mon) {
+      if (mon.spriteUrl) return mon.spriteUrl;
+      const species = this.spriteSlug(mon.speciesName || '');
+      const form = this.spriteSlug(mon.formName || '');
+      const slug = form ? `${species}-${form}` : species;
+      return `https://www.diving-fish.com/showdown/sprites/${slug}.png`;
+    },
+
+    spriteSlug(value) {
+      return String(value || '').toLowerCase()
+        .replace(/♀/g, '-f')
+        .replace(/♂/g, '-m')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    },
+  },
+}).use(vuetify).mount('#app');
+</script>
+</body>
+</html>

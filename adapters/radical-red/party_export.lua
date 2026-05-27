@@ -12,6 +12,13 @@ local PC_BOXES_OFFSET = 4
 local PC_BOX_COUNT = 25
 local PC_BOX_SIZE = 30
 local PC_MON_SIZE = 58
+local PC_SPLIT_BOX_INDEX = 20
+local PC_HIGH_STORAGE_BOX_INDEX = 20
+local PC_LOW_STORAGE_BOX_INDEX = 23
+local PC_LAST_STORAGE_BOX_INDEX = 25
+local PC_HIGH_STORAGE_DELTA = 0x13830
+local PC_LOW_STORAGE_DELTA = 0x3344
+local PC_LAST_STORAGE_DELTA = 0x4CDC
 local PARTY_MON_SIZE = 100
 local MON_NAME_LENGTH = 10
 local PLAYER_NAME_LENGTH = 7
@@ -102,6 +109,39 @@ local function readPlainSubstructures(address)
 	return substructures
 end
 
+local function readBits(address, bitOffset, bitCount)
+	local value = 0
+	for bit = 0, bitCount - 1 do
+		local byte = emu:read8(address + ((bitOffset + bit) >> 3))
+		local bitValue = (byte >> ((bitOffset + bit) & 7)) & 1
+		value = value | (bitValue << bit)
+	end
+	return value
+end
+
+local function readUnaligned32(address)
+	return emu:read8(address)
+		| (emu:read8(address + 1) << 8)
+		| (emu:read8(address + 2) << 16)
+		| (emu:read8(address + 3) << 24)
+end
+
+local function readPackedMoves(address, countByte)
+	local moves = {}
+	local moveCount = countByte + 1
+	if moveCount < 0 or moveCount > 4 then
+		moveCount = 4
+	end
+	for index = 0, 3 do
+		if index < moveCount then
+			moves[index + 1] = readBits(address, index * 10, 10)
+		else
+			moves[index + 1] = 0
+		end
+	end
+	return moves
+end
+
 local function calculateBoxChecksum(address, key)
 	local checksum = 0
 	for word = 0, 11 do
@@ -148,6 +188,7 @@ local function readBoxMon(address)
 
 	return {
 		personality = personality,
+		natureId = personality % 25,
 		otId = otId,
 		boxChecksum = storedChecksum,
 		calculatedChecksum = calculatedChecksum,
@@ -232,47 +273,83 @@ local function isValidBoxMon(mon)
 	return mon.species and mon.species > 0 and mon.species < 2000 and mon.isEgg == 0 and mon.personality ~= 0 and mon.personality ~= 0xFFFFFFFF
 end
 
+local function isValidPcMon(mon)
+	return isValidBoxMon(mon) and mon.hasSpecies == 1 and mon.isBadEgg == 0
+end
+
 local function readPcMon(address)
-	local personality = emu:read32(address)
+	local personality = readUnaligned32(address)
 	local flags = emu:read8(address + 19)
+	local ivFlags = readUnaligned32(address + 54)
 	return {
 		personality = personality,
-		otId = emu:read32(address + 4),
+		natureId = personality % 25,
+		otId = readUnaligned32(address + 4),
+		language = emu:read8(address + 18),
+		isBadEgg = flags & 1,
+		hasSpecies = (flags >> 1) & 1,
 		boxChecksum = 0,
 		calculatedChecksum = 0,
 		checksumValid = false,
-		dataFormat = "pcPlain58",
+		dataFormat = "pcPlain58Packed",
 		nickname = readPokemonString(address + 8, MON_NAME_LENGTH),
 		otName = readPokemonString(address + 20, PLAYER_NAME_LENGTH),
 		species = emu:read16(address + 28),
 		heldItem = emu:read16(address + 30),
-		experience = emu:read32(address + 32),
+		experience = readUnaligned32(address + 32),
+		ppBonuses = emu:read8(address + 36),
 		friendship = emu:read8(address + 37),
-		moves = {0, 0, 0, 0},
+		moves = readPackedMoves(address + 39, emu:read8(address + 38)),
 		pp = {0, 0, 0, 0},
-		pokerus = 0,
-		metLocation = 0,
-		metMapsec = 0,
-		metLevel = 0,
-		metGame = 0,
-		originBytes = { byte0 = 0, byte1 = 0, byte2 = 0, byte3 = 0 },
+		ppEstimated = true,
+		pokerus = emu:read8(address + 50),
+		metLocation = emu:read8(address + 51),
+		metMapsec = emu:read8(address + 51),
+		metLevel = emu:read8(address + 52),
+		metGame = emu:read8(address + 53),
+		originBytes = {
+			byte0 = emu:read8(address + 50),
+			byte1 = emu:read8(address + 51),
+			byte2 = emu:read8(address + 52),
+			byte3 = emu:read8(address + 53)
+		},
 		pokeball = 0,
 		otGender = 0,
-		evs = { hp = 0, attack = 0, defense = 0, speed = 0, spAttack = 0, spDefense = 0 },
-		ivs = { hp = 0, attack = 0, defense = 0, speed = 0, spAttack = 0, spDefense = 0 },
-		isEgg = (flags >> 2) & 1,
-		hiddenAbility = 0,
+		evs = {
+			hp = emu:read8(address + 44),
+			attack = emu:read8(address + 45),
+			defense = emu:read8(address + 46),
+			speed = emu:read8(address + 47),
+			spAttack = emu:read8(address + 48),
+			spDefense = emu:read8(address + 49)
+		},
+		ivs = {
+			hp = ivFlags & 0x1F,
+			attack = (ivFlags >> 5) & 0x1F,
+			defense = (ivFlags >> 10) & 0x1F,
+			speed = (ivFlags >> 15) & 0x1F,
+			spAttack = (ivFlags >> 20) & 0x1F,
+			spDefense = (ivFlags >> 25) & 0x1F
+		},
+		isEgg = (ivFlags >> 30) & 1,
+		hiddenAbility = (ivFlags >> 31) & 1,
 		abilityNum = personality & 1
 	}
 end
 
 local function readPcBoxes()
 	local storageAddress = emu:read32(PC_STORAGE_POINTER_ADDRESS)
+	local highStorageAddress = storageAddress + PC_HIGH_STORAGE_DELTA
+	local lowStorageAddress = storageAddress - PC_LOW_STORAGE_DELTA
+	local lastStorageAddress = storageAddress - PC_LAST_STORAGE_DELTA
 	local boxes = {}
 	local debugSlots = {}
-	if not isValidStoragePointer(storageAddress) then
+	if not isValidStoragePointer(storageAddress) or not isValidStoragePointer(highStorageAddress) or not isValidStoragePointer(lowStorageAddress) or not isValidStoragePointer(lastStorageAddress) then
 		return {
 			storageAddress = storageAddress,
+			highStorageAddress = highStorageAddress,
+			lowStorageAddress = lowStorageAddress,
+			lastStorageAddress = lastStorageAddress,
 			boxesOffset = PC_BOXES_OFFSET,
 			debugSlots = debugSlots,
 			boxes = boxes
@@ -285,9 +362,19 @@ local function readPcBoxes()
 			pokemon = {}
 		}
 		for position = 0, PC_BOX_SIZE - 1 do
-			local address = storageAddress + PC_BOXES_OFFSET + (boxIndex * PC_BOX_SIZE + position) * PC_MON_SIZE
+			local address
+			if boxIndex + 1 >= PC_LAST_STORAGE_BOX_INDEX then
+				address = lastStorageAddress + position * PC_MON_SIZE
+			elseif boxIndex + 1 >= PC_LOW_STORAGE_BOX_INDEX then
+				address = lowStorageAddress + ((boxIndex - (PC_SPLIT_BOX_INDEX - 1)) * PC_BOX_SIZE + position) * PC_MON_SIZE
+			elseif boxIndex + 1 >= PC_HIGH_STORAGE_BOX_INDEX then
+				address = highStorageAddress + ((boxIndex - (PC_HIGH_STORAGE_BOX_INDEX - 1)) * PC_BOX_SIZE + position) * PC_MON_SIZE
+			else
+				address = storageAddress + PC_BOXES_OFFSET + (boxIndex * PC_BOX_SIZE + position) * PC_MON_SIZE
+			end
 			local mon = readPcMon(address)
-			if mon.species == 163 or (mon.species and mon.species > 0 and mon.species < 2000 and mon.personality ~= 0 and mon.personality ~= 0xFFFFFFFF) then
+			local validMon = isValidPcMon(mon)
+			if validMon then
 				debugSlots[#debugSlots + 1] = {
 					box = boxIndex + 1,
 					position = position + 1,
@@ -301,7 +388,7 @@ local function readPcBoxes()
 					friendship = mon.friendship
 				}
 			end
-			if isValidBoxMon(mon) then
+			if validMon then
 				mon.box = boxIndex + 1
 				mon.position = position + 1
 				box.pokemon[#box.pokemon + 1] = mon
@@ -312,6 +399,9 @@ local function readPcBoxes()
 
 	return {
 		storageAddress = storageAddress,
+		highStorageAddress = highStorageAddress,
+		lowStorageAddress = lowStorageAddress,
+		lastStorageAddress = lastStorageAddress,
 		boxesOffset = PC_BOXES_OFFSET,
 		debugSlots = debugSlots,
 		boxes = boxes
@@ -363,7 +453,7 @@ local function originBytesToJson(originBytes)
 end
 
 local function monToJson(mon)
-	return string.format('{"slot":%d,"species":%d,"nickname":"%s","otName":"%s","level":%d,"hp":%d,"maxHP":%d,"status":%d,"heldItem":%d,"experience":%d,"friendship":%d,"moves":%s,"pp":%s,"pokerus":%d,"metLocation":%d,"metMapsec":%d,"metLevel":%d,"metGame":%d,"originBytes":%s,"pokeball":%d,"otGender":%d,"ivs":%s,"evs":%s,"stats":%s,"isEgg":%d,"hiddenAbility":%d,"abilityNum":%d,"personality":%d,"otId":%d,"boxChecksum":%d,"calculatedChecksum":%d,"checksumValid":%s,"dataFormat":"%s"}',
+	return string.format('{"slot":%d,"species":%d,"nickname":"%s","otName":"%s","level":%d,"hp":%d,"maxHP":%d,"status":%d,"heldItem":%d,"experience":%d,"friendship":%d,"moves":%s,"pp":%s,"pokerus":%d,"metLocation":%d,"metMapsec":%d,"metLevel":%d,"metGame":%d,"originBytes":%s,"pokeball":%d,"otGender":%d,"ivs":%s,"evs":%s,"stats":%s,"isEgg":%d,"hiddenAbility":%d,"abilityNum":%d,"personality":%d,"natureId":%d,"otId":%d,"boxChecksum":%d,"calculatedChecksum":%d,"checksumValid":%s,"dataFormat":"%s"}',
 		mon.slot,
 		mon.species,
 		jsonEscape(mon.nickname),
@@ -392,6 +482,7 @@ local function monToJson(mon)
 		mon.hiddenAbility,
 		mon.abilityNum,
 		mon.personality,
+		mon.natureId,
 		mon.otId,
 		mon.boxChecksum,
 		mon.calculatedChecksum,
@@ -400,7 +491,7 @@ local function monToJson(mon)
 end
 
 local function pcMonToJson(mon)
-	return string.format('{"box":%d,"position":%d,"species":%d,"nickname":"%s","otName":"%s","heldItem":%d,"experience":%d,"friendship":%d,"moves":%s,"pp":%s,"pokerus":%d,"metLocation":%d,"metMapsec":%d,"metLevel":%d,"metGame":%d,"originBytes":%s,"pokeball":%d,"otGender":%d,"ivs":%s,"evs":%s,"isEgg":%d,"hiddenAbility":%d,"abilityNum":%d,"personality":%d,"otId":%d,"boxChecksum":%d,"calculatedChecksum":%d,"checksumValid":%s,"dataFormat":"%s"}',
+	return string.format('{"box":%d,"position":%d,"species":%d,"nickname":"%s","otName":"%s","heldItem":%d,"experience":%d,"friendship":%d,"moves":%s,"pp":%s,"ppEstimated":%s,"pokerus":%d,"metLocation":%d,"metMapsec":%d,"metLevel":%d,"metGame":%d,"originBytes":%s,"pokeball":%d,"otGender":%d,"ivs":%s,"evs":%s,"isEgg":%d,"hiddenAbility":%d,"abilityNum":%d,"personality":%d,"natureId":%d,"otId":%d,"boxChecksum":%d,"calculatedChecksum":%d,"checksumValid":%s,"dataFormat":"%s"}',
 		mon.box,
 		mon.position,
 		mon.species,
@@ -411,6 +502,7 @@ local function pcMonToJson(mon)
 		mon.friendship,
 		arrayToJson(mon.moves),
 		arrayToJson(mon.pp),
+		tostring(mon.ppEstimated == true),
 		mon.pokerus,
 		mon.metLocation,
 		mon.metMapsec,
@@ -425,6 +517,7 @@ local function pcMonToJson(mon)
 		mon.hiddenAbility,
 		mon.abilityNum,
 		mon.personality,
+		mon.natureId,
 		mon.otId,
 		mon.boxChecksum,
 		mon.calculatedChecksum,
@@ -443,8 +536,11 @@ local function pcBoxesToJson(pc)
 			box.index,
 			table.concat(mons, ","))
 	end
-	return string.format('{"storageAddress":%d,"boxesOffset":%d,"debugSlots":%s,"boxes":[%s]}',
+	return string.format('{"storageAddress":%d,"highStorageAddress":%d,"lowStorageAddress":%d,"lastStorageAddress":%d,"boxesOffset":%d,"debugSlots":%s,"boxes":[%s]}',
 		pc.storageAddress,
+		pc.highStorageAddress,
+		pc.lowStorageAddress,
+		pc.lastStorageAddress,
 		pc.boxesOffset,
 		pcDebugSlotsToJson(pc.debugSlots or {}),
 		table.concat(boxes, ","))
