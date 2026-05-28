@@ -851,6 +851,38 @@
       .layout { grid-template-columns: 1fr; }
     }
 
+    /* ============== ROUTES PANEL SCROLLBAR ============== */
+    .routes-panel {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+
+    .routes-panel:hover {
+      scrollbar-color: var(--ink-soft) transparent;
+    }
+
+    .routes-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .routes-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .routes-panel::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 999px;
+      transition: background .2s ease;
+    }
+
+    .routes-panel:hover::-webkit-scrollbar-thumb {
+      background: var(--ink-soft);
+    }
+
+    .routes-panel::-webkit-scrollbar-button {
+      display: none;
+    }
+
     @media (max-width: 640px) {
       .shell { width: calc(100% - 20px); padding-top: 22px; }
       .brand-text h1 { font-size: 22px; text-shadow: 2px 2px 0 var(--gold), 4px 4px 0 var(--ink-soft); }
@@ -998,8 +1030,8 @@
         </section>
 
         <!-- LOCATIONS DIALOG -->
-        <section class="dialog-box">
-          <div class="dialog-head">
+        <section class="dialog-box" style="max-height: calc(100vh - 200px); display: flex; flex-direction: column;">
+          <div class="dialog-head" style="flex-shrink: 0;">
             <div class="dialog-title">
               <span class="cursor">▶</span>
               <span>ROUTES</span>
@@ -1008,68 +1040,70 @@
             <div class="dialog-stat">{{ overLimitCount }} 个超限</div>
           </div>
 
-          <div class="location-list" v-if="locations.length">
-            <div
-              v-for="loc in locations"
-              :key="loc.key"
-              class="location-row"
-              :class="{ over: loc.overLimit }"
-            >
-              <div class="loc-main">
-                <div class="loc-title">{{ loc.label }}</div>
-                <div class="loc-mons">
-                  <img
-                    v-for="mon in loc.pokemon"
-                    :key="mon.nuzlockeKey"
-                    class="mini-sprite"
-                    :class="{ dead: mon.dead }"
-                    :src="spriteUrl(mon)"
-                    :title="displayName(mon)"
-                    :alt="displayName(mon)"
-                  >
+          <div class="routes-panel" style="overflow-y: auto; flex: 1; min-height: 0;">
+            <div class="location-list" v-if="locations.length">
+              <div
+                v-for="loc in locations"
+                :key="loc.key"
+                class="location-row"
+                :class="{ over: loc.overLimit }"
+              >
+                <div class="loc-main">
+                  <div class="loc-title">{{ loc.label }}</div>
+                  <div class="loc-mons">
+                    <img
+                      v-for="mon in loc.pokemon"
+                      :key="mon.nuzlockeKey"
+                      class="mini-sprite"
+                      :class="{ dead: mon.dead }"
+                      :src="spriteUrl(mon)"
+                      :title="displayName(mon)"
+                      :alt="displayName(mon)"
+                    >
+                  </div>
                 </div>
-              </div>
 
-              <div class="loc-count-box">
-                <div class="loc-count-num">{{ loc.count }}<span class="lim">/{{ loc.limit }}</span></div>
-                <div class="hp-bar">
-                  <div
-                    class="fill"
-                    :class="hpFillClass(loc)"
-                    :style="{ width: hpFillWidth(loc) + '%' }"
-                  ></div>
+                <div class="loc-count-box">
+                  <div class="loc-count-num">{{ loc.count }}<span class="lim">/{{ loc.limit }}</span></div>
+                  <div class="hp-bar">
+                    <div
+                      class="fill"
+                      :class="hpFillClass(loc)"
+                      :style="{ width: hpFillWidth(loc) + '%' }"
+                    ></div>
+                  </div>
                 </div>
-              </div>
 
-              <div class="limit-wrap">
-                <span class="limit-label">LIMIT</span>
-                <div class="limit-stepper">
-                  <button
-                    type="button"
-                    class="step-btn"
-                    :disabled="(Number(loc.limit) || 0) <= 1"
-                    @click.stop="adjustLimit(loc, -1)"
-                  >◀</button>
-                  <span class="step-num">{{ loc.limit }}</span>
-                  <button
-                    type="button"
-                    class="step-btn"
-                    :disabled="(Number(loc.limit) || 0) >= 10"
-                    @click.stop="adjustLimit(loc, 1)"
-                  >▶</button>
+                <div class="limit-wrap">
+                  <span class="limit-label">LIMIT</span>
+                  <div class="limit-stepper">
+                    <button
+                      type="button"
+                      class="step-btn"
+                      :disabled="(Number(loc.limit) || 0) <= 1"
+                      @click.stop="adjustLimit(loc, -1)"
+                    >◀</button>
+                    <span class="step-num">{{ loc.limit }}</span>
+                    <button
+                      type="button"
+                      class="step-btn"
+                      :disabled="(Number(loc.limit) || 0) >= 10"
+                      @click.stop="adjustLimit(loc, 1)"
+                    >▶</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="waiting-box" v-else>
-            <svg class="pokeball-spin" viewBox="0 0 64 64" aria-hidden="true">
-              <circle cx="32" cy="32" r="28" fill="#fffcef" stroke="#1b2d4f" stroke-width="4"/>
-              <path d="M4 32 a28 28 0 0 1 56 0 Z" fill="#dc0a2d" stroke="#1b2d4f" stroke-width="4"/>
-              <line x1="6" y1="32" x2="58" y2="32" stroke="#1b2d4f" stroke-width="4"/>
-              <circle cx="32" cy="32" r="7.5" fill="#fffcef" stroke="#1b2d4f" stroke-width="4"/>
-            </svg>
-            <span>暂无区域记录…</span>
+            <div class="waiting-box" v-else>
+              <svg class="pokeball-spin" viewBox="0 0 64 64" aria-hidden="true">
+                <circle cx="32" cy="32" r="28" fill="#fffcef" stroke="#1b2d4f" stroke-width="4"/>
+                <path d="M4 32 a28 28 0 0 1 56 0 Z" fill="#dc0a2d" stroke="#1b2d4f" stroke-width="4"/>
+                <line x1="6" y1="32" x2="58" y2="32" stroke="#1b2d4f" stroke-width="4"/>
+                <circle cx="32" cy="32" r="7.5" fill="#fffcef" stroke="#1b2d4f" stroke-width="4"/>
+              </svg>
+              <span>暂无区域记录…</span>
+            </div>
           </div>
         </section>
       </div>
