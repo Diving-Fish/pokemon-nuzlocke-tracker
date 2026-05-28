@@ -846,6 +846,594 @@
       opacity: 1;
     }
 
+    /* ============== DETAIL MODAL ============== */
+    .detail-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      background: rgba(12, 21, 48, 0.55);
+      backdrop-filter: blur(2px);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      animation: detail-fade .18s ease-out;
+    }
+
+    @keyframes detail-fade { from { opacity: 0; } to { opacity: 1; } }
+
+    .detail-modal {
+      position: relative;
+      width: min(720px, 100%);
+      max-height: calc(100vh - 48px);
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      border: 4px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 0 10px 0 0 var(--ink-soft), 0 18px 50px rgba(12, 21, 48, 0.45);
+      /* No overflow: hidden — the nav arrows are positioned to peek outside.
+         Header and body each clip themselves so the modal's rounded silhouette
+         stays clean. */
+      animation: detail-rise .22s cubic-bezier(.2,.8,.25,1);
+    }
+
+    @keyframes detail-rise {
+      from { opacity: 0; transform: translateY(14px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .detail-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 20px;
+      background:
+        repeating-linear-gradient(45deg, transparent 0, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px),
+        linear-gradient(180deg, var(--ink-mid) 0%, var(--ink) 100%);
+      color: #fffcef;
+      border-bottom: 4px solid var(--ink);
+      /* 18px modal radius minus 4px border = 14px inner radius. */
+      border-radius: 14px 14px 0 0;
+    }
+
+    .detail-head-title {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 10px;
+      font-family: var(--font-head);
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      color: #fffcef;
+      text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .detail-head-title .cursor {
+      color: var(--gold);
+      font-family: monospace;
+      font-size: 17px;
+      animation: cursor-blink 1.1s steps(2) infinite;
+    }
+
+    .detail-head-title .zh {
+      font-family: var(--font-body);
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .detail-close {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: var(--crimson);
+      color: #fffcef;
+      font-family: var(--font-head);
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 0 var(--ink);
+      transition: transform .08s ease, box-shadow .08s ease;
+    }
+
+    .detail-close:hover {
+      transform: translateY(1px);
+      box-shadow: 0 3px 0 0 var(--ink);
+    }
+
+    .detail-close:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 0 var(--ink);
+    }
+
+    /* ====== Prev / Next floating pixel arrows ====== */
+    .detail-nav {
+      position: absolute;
+      top: 50%;
+      width: 48px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      font-family: var(--font-head);
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 0 var(--ink-soft), 0 10px 18px rgba(12, 21, 48, 0.18);
+      transform: translateY(-50%);
+      transition: box-shadow .12s ease, background .12s ease, color .12s ease;
+      z-index: 6;
+    }
+
+    /* Negative offset so roughly half the button peeks out past the dialog edge. */
+    .detail-nav-left  { left: -22px; }
+    .detail-nav-right { right: -22px; }
+
+    .detail-nav .nav-chevron {
+      display: inline-block;
+      line-height: 1;
+      will-change: transform;
+    }
+
+    /* Subtle horizontal drift that hints at the direction the button navigates. */
+    .detail-nav-left .nav-chevron {
+      animation: nav-bob-left 1.6s ease-in-out infinite;
+    }
+
+    .detail-nav-right .nav-chevron {
+      animation: nav-bob-right 1.6s ease-in-out infinite;
+      animation-delay: .8s;
+    }
+
+    @keyframes nav-bob-left {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(-3px); }
+    }
+
+    @keyframes nav-bob-right {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(3px); }
+    }
+
+    .detail-nav:hover {
+      background: var(--gold);
+      color: var(--crimson);
+      box-shadow: 0 6px 0 0 var(--ink), 0 12px 22px rgba(12, 21, 48, 0.22);
+    }
+
+    .detail-nav:hover .nav-chevron {
+      animation-duration: .9s;
+    }
+
+    .detail-nav:active {
+      transform: translateY(calc(-50% + 4px));
+      box-shadow: 0 1px 0 0 var(--ink), 0 4px 10px rgba(12, 21, 48, 0.2);
+    }
+
+    .detail-nav:focus-visible {
+      outline: none;
+      box-shadow: 0 5px 0 0 var(--ink), 0 0 0 4px var(--gold-bg);
+    }
+
+    .detail-body {
+      padding: 20px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      display: grid;
+      gap: 18px;
+      /* flex: 1 + min-height: 0 lets this child shrink below its content's
+         intrinsic size so overflow-y can actually scroll inside the modal. */
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    /* Match the trainer card's scrollbar treatment: thin, ink-soft on hover. */
+    .detail-body {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+
+    .detail-body:hover { scrollbar-color: var(--ink-soft) transparent; }
+    .detail-body::-webkit-scrollbar { width: 6px; }
+    .detail-body::-webkit-scrollbar-track { background: transparent; }
+    .detail-body::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 999px;
+      transition: background .2s ease;
+    }
+    .detail-body:hover::-webkit-scrollbar-thumb { background: var(--ink-soft); }
+
+    .detail-id {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 18px;
+      align-items: center;
+      padding: 14px;
+      background: linear-gradient(180deg, #ffffff, var(--paper-2));
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      box-shadow: 0 4px 0 0 rgba(27, 45, 79, 0.22);
+    }
+
+    .detail-sprite-wrap {
+      display: grid;
+      place-items: center;
+      aspect-ratio: 1;
+      background: radial-gradient(circle at 50% 60%, rgba(246,197,68,.35), transparent 65%), var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+    }
+
+    .detail-sprite {
+      width: 108px;
+      height: 108px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(2px 4px 0 rgba(27, 45, 79, 0.3));
+    }
+
+    .detail-id.dead .detail-sprite { filter: grayscale(1) opacity(.55); }
+
+    .detail-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px 14px;
+    }
+
+    .detail-headline .name {
+      font-family: var(--font-body);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.5px;
+    }
+
+    .detail-headline .lv {
+      font-family: var(--font-head);
+      font-size: 13px;
+      color: var(--crimson);
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      background: var(--crimson-bg);
+      border: 2px solid var(--crimson);
+      border-radius: 999px;
+    }
+
+    .detail-headline .dex {
+      font-family: var(--font-head);
+      font-size: 11px;
+      color: var(--ink-soft);
+      letter-spacing: 1px;
+    }
+
+    .detail-meta {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 6px 14px;
+      font-size: 16px;
+    }
+
+    .detail-meta .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 2px 0;
+    }
+
+    .detail-meta .label {
+      color: var(--ink-mid);
+      font-size: 15px;
+    }
+
+    .detail-meta .value {
+      color: var(--ink);
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ====== Section title (shared) ====== */
+    .detail-section {
+      background: linear-gradient(180deg, #ffffff, var(--paper-2));
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      box-shadow: 0 4px 0 0 rgba(27, 45, 79, 0.22);
+    }
+
+    .detail-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      background: linear-gradient(180deg, var(--ink-mid), var(--ink));
+      color: var(--gold);
+      font-family: var(--font-head);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      border-radius: 10px;
+    }
+
+    .detail-section-head .zh {
+      font-family: var(--font-body);
+      font-size: 18px;
+      color: #fffcef;
+      letter-spacing: 1px;
+    }
+
+    .detail-section-body { padding: 14px; }
+
+    /* ====== Moves list ====== */
+    .moves-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .move-tile {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--paper);
+      border: 2.5px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: 0 3px 0 0 rgba(27, 45, 79, 0.22);
+      min-height: 48px;
+    }
+
+    .move-tile.empty {
+      background: repeating-linear-gradient(45deg, var(--paper) 0 8px, var(--paper-2) 8px 16px);
+      color: var(--ink-faint);
+    }
+
+    .move-name {
+      font-family: var(--font-body);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .move-tile.empty .move-name {
+      color: var(--ink-faint);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .move-pp {
+      flex: 0 0 auto;
+      font-family: var(--font-head);
+      font-size: 11px;
+      color: var(--ink-mid);
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      background: var(--paper-shadow);
+      border: 2px solid var(--ink-soft);
+      border-radius: 6px;
+    }
+
+    /* ====== Radar / stats ====== */
+    .stat-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .stat-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 8px 4px;
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      font-family: var(--font-body);
+      box-shadow: 0 3px 0 0 var(--ink-soft);
+      transition: transform .08s ease, box-shadow .08s ease;
+    }
+
+    .stat-tab:hover { transform: translateY(1px); box-shadow: 0 2px 0 0 var(--ink-soft); }
+    .stat-tab:active { transform: translateY(3px); box-shadow: 0 0 0 0 var(--ink-soft); }
+
+    .stat-tab .tab-en {
+      font-family: var(--font-head);
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: var(--ink-mid);
+    }
+
+    .stat-tab .tab-zh {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .stat-tab .swatch {
+      width: 18px;
+      height: 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+      border: 1.5px solid var(--ink);
+    }
+
+    .stat-tab.active {
+      color: #fffcef;
+      box-shadow: 0 3px 0 0 var(--ink);
+    }
+
+    .stat-tab.active .tab-en { color: rgba(255, 252, 239, 0.85); }
+
+    .stat-tab[data-mode="actual"].active { background: var(--crimson); border-color: var(--crimson-deep); }
+    .stat-tab[data-mode="base"].active   { background: var(--gold);    border-color: var(--gold-deep); color: var(--ink); }
+    .stat-tab[data-mode="base"].active .tab-en { color: var(--ink-mid); }
+    .stat-tab[data-mode="ev"].active     { background: var(--leaf);    border-color: var(--leaf-deep); }
+    .stat-tab[data-mode="iv"].active     { background: var(--sky-accent); border-color: #1d5fa0; }
+
+    .radar-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .radar-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .radar-stage svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .radar-grid-line {
+      fill: rgba(27, 45, 79, 0.03);
+      stroke: rgba(27, 45, 79, 0.22);
+      stroke-width: 1.2;
+      stroke-dasharray: 2 3;
+    }
+
+    .radar-axis {
+      stroke: rgba(27, 45, 79, 0.28);
+      stroke-width: 1;
+    }
+
+    .radar-shape {
+      stroke-width: 3;
+      stroke-linejoin: round;
+      animation: radar-fade .35s ease-out;
+    }
+
+    .radar-shape-fill { opacity: 0.32; }
+    .radar-shape-line { fill: none; }
+
+    .radar-dot {
+      stroke: var(--ink);
+      stroke-width: 1.5;
+      animation: radar-fade .35s ease-out;
+    }
+
+    @keyframes radar-fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .radar-shape-fill { animation-name: radar-fade-fill; }
+    @keyframes radar-fade-fill {
+      from { opacity: 0; }
+      to   { opacity: 0.32; }
+    }
+
+    .radar-label {
+      font-family: var(--font-head);
+      font-size: 9px;
+      fill: var(--ink-mid);
+      letter-spacing: 1px;
+    }
+
+    .radar-numbers {
+      display: grid;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 16px;
+    }
+
+    .radar-number-row {
+      display: grid;
+      grid-template-columns: minmax(48px, 1fr) auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px;
+      background: var(--paper);
+      border: 2px solid var(--ink-soft);
+      border-radius: 8px;
+    }
+
+    .radar-number-row .stat-label {
+      color: var(--ink-mid);
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    .radar-number-row .stat-label-hp {
+      font-family: var(--font-head);
+    }
+
+    .radar-number-row .stat-value {
+      color: var(--ink);
+      font-family: var(--font-num);
+      font-size: 19px;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    .radar-number-row .stat-meter {
+      width: 70px;
+      height: 8px;
+      background: var(--paper-shadow);
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .radar-number-row .stat-meter > span {
+      display: block;
+      height: 100%;
+      transition: width .35s cubic-bezier(.2,.8,.25,1), background .25s ease;
+    }
+
+    .stat-total {
+      margin-top: 10px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--ink);
+      color: var(--gold);
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+    }
+
+    .stat-total .total-num {
+      font-family: var(--font-num);
+      font-size: 22px;
+      color: var(--gold);
+    }
+
+    .stat-unavailable {
+      padding: 18px 14px;
+      text-align: center;
+      font-family: var(--font-body);
+      font-size: 17px;
+      color: var(--ink-soft);
+      background: repeating-linear-gradient(45deg, var(--paper-2) 0 8px, var(--paper) 8px 16px);
+      border: 2px dashed var(--ink-soft);
+      border-radius: 10px;
+    }
+
     /* ============== RESPONSIVE ============== */
     @media (max-width: 1080px) {
       .layout { grid-template-columns: 1fr; }
@@ -896,11 +1484,21 @@
       .mini-sprite { width: 32px; height: 32px; }
       .dialog-title { font-size: 11px; }
       .dialog-title .zh { font-size: 20px; }
+      .detail-id { grid-template-columns: 96px 1fr; padding: 10px; gap: 12px; }
+      .detail-sprite { width: 78px; height: 78px; }
+      .detail-headline .name { font-size: 22px; }
+      .moves-grid { grid-template-columns: 1fr; }
+      .radar-shell { grid-template-columns: 1fr; }
+      .radar-stage { max-width: 240px; }
+      .stat-tabs { grid-template-columns: repeat(2, 1fr); }
+      .detail-nav { width: 36px; height: 44px; font-size: 14px; }
+      .detail-nav-left  { left: 6px; }
+      .detail-nav-right { right: 6px; }
     }
   </style>
 </head>
 <body>
-<div id="app" v-cloak @click="closeMenu">
+<div id="app" v-cloak>
   <v-app>
     <main class="shell">
       <!-- ===================== TRAINER HEADER ===================== -->
@@ -981,6 +1579,7 @@
               location="top"
               open-delay="120"
               close-delay="70"
+              :disabled="tooltipsSuppressed"
             >
               <template #activator="{ props }">
                 <div
@@ -1118,9 +1717,200 @@
       :style="{ left: menu.x + 'px', top: menu.y + 'px' }"
       @click.stop
     >
+      <button class="menu-item" @click="openDetail(menu.mon)">查看详情</button>
       <button class="menu-item" @click="setDead(menu.mon, !menu.mon.dead)">
         {{ menu.mon.dead ? '复活' : '标记死亡' }}
       </button>
+    </div>
+
+    <!-- ===================== DETAIL MODAL ===================== -->
+    <div
+      v-if="detail.mon"
+      class="detail-backdrop"
+      @click.self="closeDetail"
+    >
+      <div class="detail-modal" role="dialog" aria-modal="true">
+        <div class="detail-head">
+          <div class="detail-head-title">
+            <span class="cursor">▶</span>
+            <span>DETAIL</span>
+            <span class="zh">详细情报</span>
+          </div>
+          <button class="detail-close" @click="closeDetail" aria-label="close">✕</button>
+        </div>
+
+        <button
+          v-if="pokemon.length > 1"
+          class="detail-nav detail-nav-left"
+          type="button"
+          aria-label="上一只"
+          @click="navigateDetail(-1)"
+        ><span class="nav-chevron">◀</span></button>
+
+        <button
+          v-if="pokemon.length > 1"
+          class="detail-nav detail-nav-right"
+          type="button"
+          aria-label="下一只"
+          @click="navigateDetail(1)"
+        ><span class="nav-chevron">▶</span></button>
+
+        <div class="detail-body">
+          <!-- Identity card -->
+          <div class="detail-id" :class="{ dead: detail.mon.dead }">
+            <div class="detail-sprite-wrap">
+              <img
+                v-if="!imgErrors[detail.mon.nuzlockeKey]"
+                class="detail-sprite"
+                :src="spriteUrl(detail.mon)"
+                :alt="displayName(detail.mon)"
+                @error="imgErrors[detail.mon.nuzlockeKey] = true"
+              >
+              <span v-else class="fallback">{{ initials(detail.mon) }}</span>
+            </div>
+            <div>
+              <div class="detail-headline">
+                <span class="name">{{ displayName(detail.mon) }}</span>
+                <span class="lv" v-if="detail.mon.level">{{ levelText(detail.mon) }}</span>
+                <span class="dex" v-if="detail.mon.dexId">No. {{ String(detail.mon.dexId).padStart(3, '0') }}</span>
+              </div>
+              <div class="detail-meta">
+                <div class="row"><span class="label">特性</span><span class="value">{{ displayAbility(detail.mon) }}</span></div>
+                <div class="row"><span class="label">性格</span><span class="value">{{ detail.mon.natureNameZh || detail.mon.natureName || '未知' }}</span></div>
+                <div class="row"><span class="label">携带</span><span class="value">{{ displayItem(detail.mon) }}</span></div>
+                <div class="row"><span class="label">HP</span><span class="value">{{ hpText(detail.mon) }}</span></div>
+                <div class="row"><span class="label">状态</span><span class="value">{{ detail.mon.dead ? '死亡' : '存活' }}</span></div>
+                <div class="row"><span class="label">遇见</span><span class="value">{{ locationText(detail.mon) }}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Moves -->
+          <section class="detail-section">
+            <header class="detail-section-head">
+              <span>MOVES</span>
+              <span class="zh">招式</span>
+            </header>
+            <div class="detail-section-body">
+              <div class="moves-grid">
+                <div
+                  v-for="(slot, idx) in moveSlots(detail.mon)"
+                  :key="idx"
+                  class="move-tile"
+                  :class="{ empty: !slot.name }"
+                >
+                  <span class="move-name">{{ slot.name || '— 空 —' }}</span>
+                  <span class="move-pp" v-if="slot.name && slot.pp != null">PP {{ slot.pp }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Stats / Radar -->
+          <section class="detail-section">
+            <header class="detail-section-head">
+              <span>STATS</span>
+              <span class="zh">六维分布</span>
+            </header>
+            <div class="detail-section-body">
+              <div class="stat-tabs">
+                <button
+                  v-for="mode in statModes"
+                  :key="mode.key"
+                  type="button"
+                  class="stat-tab"
+                  :class="{ active: detail.mode === mode.key }"
+                  :data-mode="mode.key"
+                  @click="detail.mode = mode.key"
+                >
+                  <span class="tab-en">{{ mode.en }}</span>
+                  <span class="tab-zh">{{ mode.zh }}</span>
+                  <span class="swatch" :style="{ background: mode.color }"></span>
+                </button>
+              </div>
+
+              <div v-if="activeStatValues" class="radar-shell">
+                <div class="radar-stage">
+                  <svg viewBox="-150 -150 300 300" aria-hidden="true">
+                    <!-- grid rings -->
+                    <polygon
+                      v-for="ring in radarRings"
+                      :key="'r' + ring"
+                      class="radar-grid-line"
+                      :points="hexPoints(ring)"
+                    />
+                    <!-- axes -->
+                    <line
+                      v-for="(axis, idx) in radarAxes"
+                      :key="'a' + idx"
+                      class="radar-axis"
+                      x1="0" y1="0"
+                      :x2="axis.x" :y2="axis.y"
+                    />
+                    <!-- shape (keyed so the entrance animation replays on mode/mon change) -->
+                    <polygon
+                      :key="'fill-' + detail.mode + '-' + detail.mon.nuzlockeKey"
+                      class="radar-shape radar-shape-fill"
+                      :points="radarPoints"
+                      :fill="activeMode.color"
+                    />
+                    <polygon
+                      :key="'line-' + detail.mode + '-' + detail.mon.nuzlockeKey"
+                      class="radar-shape radar-shape-line"
+                      :points="radarPoints"
+                      :stroke="activeMode.colorDeep"
+                    />
+                    <!-- dots -->
+                    <circle
+                      v-for="(pt, idx) in radarDots"
+                      :key="'d-' + detail.mode + '-' + detail.mon.nuzlockeKey + '-' + idx"
+                      class="radar-dot"
+                      :cx="pt.x" :cy="pt.y"
+                      r="3.5"
+                      :fill="activeMode.colorDeep"
+                    />
+                    <!-- labels -->
+                    <text
+                      v-for="(axis, idx) in radarAxes"
+                      :key="'l' + idx"
+                      class="radar-label"
+                      :x="axis.labelX"
+                      :y="axis.labelY"
+                      :text-anchor="axis.anchor"
+                      dominant-baseline="middle"
+                    >{{ axis.label }}</text>
+                  </svg>
+                </div>
+
+                <div class="radar-numbers">
+                  <div
+                    v-for="(stat, idx) in statDisplayKeys"
+                    :key="stat.key"
+                    class="radar-number-row"
+                  >
+                    <span class="stat-label" :class="{'stat-label-hp': stat.key == 'hp'}">{{ stat.zh }}</span>
+                    <span class="stat-value">{{ activeStatValues[stat.key] ?? '—' }}</span>
+                    <span class="stat-meter">
+                      <span :style="{
+                        width: meterWidth(activeStatValues[stat.key]) + '%',
+                        background: activeMode.color
+                      }"></span>
+                    </span>
+                  </div>
+                  <div class="stat-total">
+                    <span>TOTAL</span>
+                    <span class="total-num">{{ statTotal }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else class="stat-unavailable">
+                此模式数据缺失（{{ activeMode.zh }}）
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   </v-app>
 </div>
@@ -1144,6 +1934,28 @@ const vuetify = Vuetify.createVuetify({
   },
 });
 
+// Clockwise order around the radar starting at the top vertex
+// (HP at 12 o'clock → ATK → DEF → SPE → SpD → SpA back to top).
+const STAT_KEYS = [
+  { key: 'hp',        zh: 'HP',  short: 'HP' },
+  { key: 'attack',    zh: '攻击', short: 'ATK' },
+  { key: 'defense',   zh: '防御', short: 'DEF' },
+  { key: 'speed',     zh: '速度', short: 'SPE' },
+  { key: 'spDefense', zh: '特防', short: 'SpD' },
+  { key: 'spAttack',  zh: '特攻', short: 'SpA' },
+];
+
+// Conventional display order for the side number panel.
+const STAT_DISPLAY_KEYS = ['hp', 'attack', 'defense', 'spAttack', 'spDefense', 'speed']
+  .map((k) => STAT_KEYS.find((s) => s.key === k));
+
+const STAT_MODES = [
+  { key: 'actual', en: 'ACTUAL', zh: '实际数值', color: '#dc0a2d', colorDeep: '#a40020', max: 500 },
+  { key: 'base',   en: 'BASE',   zh: '种族值',   color: '#f6c544', colorDeep: '#c9941b', max: 200 },
+  { key: 'ev',     en: 'EV',     zh: '努力值',   color: '#51a85d', colorDeep: '#2f7a3c', max: 252 },
+  { key: 'iv',     en: 'IV',     zh: '个体值',   color: '#2b7fd6', colorDeep: '#1d5fa0', max: 31  },
+];
+
 createApp({
   data() {
     return {
@@ -1159,6 +1971,10 @@ createApp({
       rolling: false,
       rollTimer: null,
       pendingLimits: {},
+      detail: { mon: null, mode: 'actual' },
+      statKeys: STAT_KEYS,
+      statDisplayKeys: STAT_DISPLAY_KEYS,
+      statModes: STAT_MODES,
     };
   },
 
@@ -1173,6 +1989,59 @@ createApp({
       if (!this.receivedAt) return '--:--:--';
       return new Date(this.receivedAt).toLocaleTimeString('zh-CN', { hour12: false });
     },
+    tooltipsSuppressed() {
+      return Boolean(this.menu.mon || this.detail.mon);
+    },
+    activeMode() {
+      return STAT_MODES.find((m) => m.key === this.detail.mode) || STAT_MODES[0];
+    },
+    activeStatValues() {
+      const mon = this.detail.mon;
+      if (!mon) return null;
+      return this.statValuesFor(mon, this.detail.mode);
+    },
+    statTotal() {
+      const v = this.activeStatValues;
+      if (!v) return 0;
+      return STAT_KEYS.reduce((acc, s) => acc + (Number(v[s.key]) || 0), 0);
+    },
+    radarRings() { return [0.25, 0.5, 0.75, 1]; },
+    radarAxes() {
+      const radius = 116;
+      const labelRadius = 138;
+      return STAT_KEYS.map((stat, idx) => {
+        // top vertex at -90deg, then 60deg per step
+        const angle = (-90 + idx * 60) * Math.PI / 180;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const anchor = Math.abs(cos) < 0.01 ? 'middle' : (cos > 0 ? 'start' : 'end');
+        return {
+          x: cos * radius,
+          y: sin * radius,
+          labelX: cos * labelRadius,
+          labelY: sin * labelRadius,
+          anchor,
+          label: stat.short,
+        };
+      });
+    },
+    radarDots() {
+      const values = this.activeStatValues;
+      if (!values) return [];
+      const radius = 116;
+      const max = this.activeMode.max;
+      return STAT_KEYS.map((stat, idx) => {
+        const angle = (-90 + idx * 60) * Math.PI / 180;
+        const ratio = Math.max(0, Math.min(1, (Number(values[stat.key]) || 0) / max));
+        return {
+          x: Math.cos(angle) * radius * ratio,
+          y: Math.sin(angle) * radius * ratio,
+        };
+      });
+    },
+    radarPoints() {
+      return this.radarDots.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
+    },
   },
 
   mounted() {
@@ -1180,8 +2049,27 @@ createApp({
     this.refresh();
     setInterval(this.refresh, 1000);
     window.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') this.closeMenu();
+      if (event.key !== 'Escape') return;
+      if (this.detail.mon) this.closeDetail();
+      else this.closeMenu();
     });
+    // Vuetify teleports overlays outside #app, so binding closeMenu on #app
+    // misses clicks that land on those areas. Listen on document instead, and
+    // ignore clicks inside the menu itself.
+    document.addEventListener('click', (event) => {
+      if (!this.menu.mon) return;
+      if (event.target.closest('.context-menu')) return;
+      this.closeMenu();
+    });
+  },
+
+  watch: {
+    pokemon(list) {
+      if (!this.detail.mon) return;
+      // Keep detail view in sync with the latest server data for the same mon.
+      const fresh = list.find((m) => m.nuzlockeKey === this.detail.mon.nuzlockeKey);
+      this.detail.mon = fresh || null;
+    },
   },
 
   methods: {
@@ -1260,12 +2148,87 @@ createApp({
       this.menu = {
         mon,
         x: Math.min(event.clientX, window.innerWidth - 196),
-        y: Math.min(event.clientY, window.innerHeight - 60),
+        y: Math.min(event.clientY, window.innerHeight - 110),
       };
     },
 
     closeMenu() {
       this.menu.mon = null;
+    },
+
+    openDetail(mon) {
+      this.detail.mon = mon;
+      // Prefer the first mode that actually has data for this mon.
+      const preferred = ['actual', 'base', 'ev', 'iv'];
+      this.detail.mode = preferred.find((mode) => this.statValuesFor(mon, mode)) || 'actual';
+      this.closeMenu();
+    },
+
+    closeDetail() {
+      this.detail.mon = null;
+    },
+
+    navigateDetail(delta) {
+      const list = this.pokemon;
+      if (!list.length || !this.detail.mon) return;
+      const idx = list.findIndex((m) => m.nuzlockeKey === this.detail.mon.nuzlockeKey);
+      if (idx < 0) return;
+      const next = list[(idx + delta + list.length) % list.length];
+      this.detail.mon = next;
+      // Preserve the current mode if the new mon has data for it; otherwise
+      // fall back to the first mode that does.
+      if (!this.statValuesFor(next, this.detail.mode)) {
+        const preferred = ['actual', 'base', 'ev', 'iv'];
+        this.detail.mode = preferred.find((mode) => this.statValuesFor(next, mode)) || 'actual';
+      }
+    },
+
+    statValuesFor(mon, mode) {
+      if (!mon) return null;
+      if (mode === 'iv') return mon.ivs || null;
+      if (mode === 'ev') return mon.evs || null;
+      if (mode === 'base') return mon.baseStats || null;
+      // actual: party mons have mon.stats (no hp) and mon.maxHP; boxed mons lack stats
+      const stats = mon.stats;
+      const maxHP = mon.maxHP;
+      if (!stats || maxHP == null) return null;
+      return {
+        hp:        maxHP,
+        attack:    stats.attack,
+        defense:   stats.defense,
+        spAttack:  stats.spAttack,
+        spDefense: stats.spDefense,
+        speed:     stats.speed,
+      };
+    },
+
+    moveSlots(mon) {
+      const names = Array.isArray(mon?.moveNames) ? mon.moveNames : [];
+      const ids = Array.isArray(mon?.moves) ? mon.moves : [];
+      const pps = Array.isArray(mon?.pp) ? mon.pp : [];
+      const slots = [];
+      for (let i = 0; i < 4; i++) {
+        const id = ids[i];
+        const rawName = names[i];
+        const translated = rawName ? this.t('moves', rawName) : null;
+        const name = id ? (translated || rawName || ('#' + id)) : '';
+        slots.push({ name, pp: pps[i] });
+      }
+      return slots;
+    },
+
+    hexPoints(scale) {
+      const radius = 116 * scale;
+      return Array.from({ length: 6 }, (_, idx) => {
+        const angle = (-90 + idx * 60) * Math.PI / 180;
+        return `${(Math.cos(angle) * radius).toFixed(2)},${(Math.sin(angle) * radius).toFixed(2)}`;
+      }).join(' ');
+    },
+
+    meterWidth(value) {
+      const max = this.activeMode.max;
+      const v = Number(value) || 0;
+      return Math.max(0, Math.min(100, Math.round((v / max) * 100)));
     },
 
     rollDice() {
