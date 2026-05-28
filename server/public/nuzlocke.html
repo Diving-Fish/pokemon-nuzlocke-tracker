@@ -1107,6 +1107,28 @@
       border-radius: 999px;
     }
 
+    .detail-headline .level-select {
+      appearance: none;
+      min-width: 132px;
+      height: 31px;
+      padding: 3px 28px 3px 10px;
+      font-family: var(--font-head);
+      font-size: 11px;
+      color: var(--crimson);
+      background:
+        linear-gradient(45deg, transparent 50%, var(--crimson) 50%) right 11px center / 6px 6px no-repeat,
+        linear-gradient(135deg, var(--crimson) 50%, transparent 50%) right 7px center / 6px 6px no-repeat,
+        var(--crimson-bg);
+      border: 2px solid var(--crimson);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .detail-headline .level-select:focus {
+      outline: 3px solid var(--gold-bg);
+      outline-offset: 2px;
+    }
+
     .detail-headline .dex {
       font-family: var(--font-head);
       font-size: 11px;
@@ -1771,7 +1793,20 @@
             <div>
               <div class="detail-headline">
                 <span class="name">{{ displayName(detail.mon) }}</span>
-                <span class="lv" v-if="detail.mon.level">{{ levelText(detail.mon) }}</span>
+                <select
+                  v-if="canOverrideLevel(detail.mon)"
+                  class="level-select"
+                  :value="detail.mon.growthRateName"
+                  @change="setGrowthRate(detail.mon, $event.target.value)"
+                  @click.stop
+                >
+                  <option
+                    v-for="option in detail.mon.levelOptions"
+                    :key="option.growthRateName"
+                    :value="option.growthRateName"
+                  >{{ growthRateLabel(option) }}</option>
+                </select>
+                <span class="lv" v-else-if="detail.mon.level">{{ levelText(detail.mon) }}</span>
                 <span class="dex" v-if="detail.mon.dexId">No. {{ String(detail.mon.dexId).padStart(3, '0') }}</span>
               </div>
               <div class="detail-meta">
@@ -2144,6 +2179,20 @@ createApp({
       }
     },
 
+    async setGrowthRate(mon, growthRateName) {
+      if (!mon?.nuzlockeKey || !growthRateName) return;
+      try {
+        await fetch('/nuzlocke/growth-rate', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ key: mon.nuzlockeKey, growthRateName }),
+        });
+        await this.refresh();
+      } catch (error) {
+        this.error = error.message;
+      }
+    },
+
     openMenu(event, mon) {
       this.menu = {
         mon,
@@ -2259,6 +2308,23 @@ createApp({
 
     levelText(mon) {
       return mon.level ? 'Lv ' + mon.level : '';
+    },
+
+    canOverrideLevel(mon) {
+      return mon?.source === 'box' && Array.isArray(mon.levelOptions) && mon.levelOptions.length > 0;
+    },
+
+    growthRateLabel(option) {
+      const labels = {
+        erratic: '不定',
+        slow: '慢',
+        'medium-slow': '中慢',
+        medium: '普通',
+        fast: '快',
+        fluctuating: '波动',
+      };
+      const name = labels[option.growthRateName] || option.growthRateName;
+      return `Lv ${option.level} ${name}`;
     },
 
     displayAbility(mon) {

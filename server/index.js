@@ -41,6 +41,63 @@ function readText(relativePath) {
   }
 }
 
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (quoted) {
+      if (char === '"' && text[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        cell += char;
+      }
+    } else if (char === '"') {
+      quoted = true;
+    } else if (char === ',') {
+      row.push(cell);
+      cell = '';
+    } else if (char === '\n') {
+      row.push(cell.replace(/\r$/, ''));
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+  if (cell || row.length) {
+    row.push(cell.replace(/\r$/, ''));
+    rows.push(row);
+  }
+  const header = rows.shift() || [];
+  return rows
+    .filter((cells) => cells.length === header.length)
+    .map((cells) => Object.fromEntries(header.map((key, index) => [key, cells[index]])));
+}
+
+function loadGrowthRateData(adapterId) {
+  const dataDir = path.join(PROJECT_ROOT, 'adapters', adapterId, 'data');
+  const speciesPath = path.join(dataDir, 'pokeapi_pokemon_species.csv');
+  const ratesPath = path.join(dataDir, 'pokeapi_growth_rates.csv');
+  try {
+    const speciesRows = parseCsv(fs.readFileSync(speciesPath, 'utf8'));
+    const rateRows = parseCsv(fs.readFileSync(ratesPath, 'utf8'));
+    return {
+      speciesGrowthRateIds: new Map(speciesRows.map((row) => [Number(row.id), Number(row.growth_rate_id)])),
+      growthRateNames: new Map(rateRows.map((row) => [Number(row.id), row.identifier])),
+    };
+  } catch (error) {
+    if (error.code !== 'ENOENT') console.warn(`[server] failed to load growth rate CSVs: ${error.message}`);
+    return null;
+  }
+}
+
 const adapterCache = new Map();
 
 function getAdapter(adapterId = DEFAULT_ADAPTER_ID) {
@@ -57,6 +114,7 @@ function getAdapterContext(adapterId = DEFAULT_ADAPTER_ID) {
     adapterCache.set(adapter.id, {
       adapter,
       data,
+      growthRateData: loadGrowthRateData(adapter.id),
       translations,
       translationsJson: JSON.stringify({
         species: Object.fromEntries(translations.species),
@@ -174,14 +232,18 @@ function resolveAbility(mon, speciesRecord, data) {
   const abilityGroups = Array.isArray(speciesRecord?.abilities) ? speciesRecord.abilities : [];
   const hiddenGroup = abilityGroups[0] || [];
   const standardSlot = Number.isInteger(mon.abilityNum) ? mon.abilityNum : 0;
-  const standardIndex = standardSlot === 1 && abilityGroups[2] ? 2 : 1;
-  const group = mon.hiddenAbility ? hiddenGroup : (abilityGroups[standardIndex] || abilityGroups[1] || hiddenGroup);
-  const abilityId = Array.isArray(group) ? group.find((id) => id) : group;
+  const firstAbilityId = (group) => Array.isArray(group) ? group.find((id) => id) : group;
+  const secondAbilityId = firstAbilityId(abilityGroups[2]);
+  const standardIndex = standardSlot === 1 && secondAbilityId ? 2 : 1;
+  const standardGroup = abilityGroups[standardIndex] || abilityGroups[1] || hiddenGroup;
+  const hiddenAbilityId = firstAbilityId(hiddenGroup);
+  const standardAbilityId = firstAbilityId(standardGroup);
+  const abilityId = mon.hiddenAbility && hiddenAbilityId ? hiddenAbilityId : standardAbilityId;
   const abilityName = getRecordName(lookupById(data.abilities, abilityId));
 
   const abilityCandidates = abilityGroups
     .map((g, idx) => {
-      const candidateId = Array.isArray(g) ? g.find((id) => id) : g;
+      const candidateId = firstAbilityId(g);
       const candidateName = getRecordName(lookupById(data.abilities, candidateId));
       if (!candidateId || !candidateName) return null;
       const slot = idx === 0 ? 'hidden' : idx === 1 ? 'first' : 'second';
@@ -192,7 +254,124 @@ function resolveAbility(mon, speciesRecord, data) {
   return { abilityId: abilityId || null, abilityName, abilityCandidates };
 }
 
-function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID) {
+const NATURE_STAT_KEYS = ['attack', 'defense', 'speed', 'spAttack', 'spDefense'];
+const GROWTH_RATE_NAMES = ['erratic', 'fast', 'medium', 'medium-slow', 'slow', 'fluctuating'];
+
+function canonicalGrowthRateName(name) {
+  if (name === 'slow-then-very-fast') return 'erratic';
+  if (name === 'fast-then-very-slow') return 'fluctuating';
+  return name;
+}
+
+function expForLevel(growthRateName, level) {
+  const n = level;
+  const rate = canonicalGrowthRateName(growthRateName);
+  if (n <= 1) return 0;
+  switch (rate) {
+    case 'slow':
+      return Math.floor(5 * n ** 3 / 4);
+    case 'medium':
+      return n ** 3;
+    case 'fast':
+      return Math.floor(4 * n ** 3 / 5);
+    case 'medium-slow':
+      return Math.floor(6 * n ** 3 / 5 - 15 * n ** 2 + 100 * n - 140);
+    case 'erratic':
+      if (n <= 50) return Math.floor(n ** 3 * (100 - n) / 50);
+      if (n <= 68) return Math.floor(n ** 3 * (150 - n) / 100);
+      if (n <= 98) return Math.floor(n ** 3 * Math.floor((1911 - 10 * n) / 3) / 500);
+      return Math.floor(n ** 3 * (160 - n) / 100);
+    case 'fluctuating':
+      if (n <= 15) return Math.floor(n ** 3 * (Math.floor((n + 1) / 3) + 24) / 50);
+      if (n <= 36) return Math.floor(n ** 3 * (n + 14) / 50);
+      return Math.floor(n ** 3 * (Math.floor(n / 2) + 32) / 50);
+    default:
+      return null;
+  }
+}
+
+function levelFromExperience(growthRateName, experience) {
+  if (!growthRateName || !Number.isFinite(experience)) return null;
+  let level = 1;
+  for (let candidate = 2; candidate <= 100; candidate++) {
+    const requiredExp = expForLevel(growthRateName, candidate);
+    if (requiredExp == null || experience < requiredExp) break;
+    level = candidate;
+  }
+  return level;
+}
+
+function levelOptionsFromExperience(experience, selectedGrowthRateName = null) {
+  if (!Number.isFinite(experience)) return [];
+  const selected = canonicalGrowthRateName(selectedGrowthRateName);
+  return GROWTH_RATE_NAMES.map((growthRateName) => ({
+    growthRateName,
+    level: levelFromExperience(growthRateName, experience),
+    selected: selected === growthRateName,
+  })).filter((option) => option.level);
+}
+
+function inferLevel(mon, speciesRecord, growthRateData, adapterId) {
+  if (!growthRateData || Number.isInteger(mon.level)) return null;
+  const overrideName = nuzlockeState?.growthRateOverrides?.[monIdentity(mon, adapterId)] || null;
+  const dexId = speciesRecord?.dexID ?? mon.species;
+  const growthRateId = growthRateData.speciesGrowthRateIds.get(Number(dexId));
+  const defaultGrowthRateName = growthRateData.growthRateNames.get(growthRateId);
+  const growthRateName = overrideName || canonicalGrowthRateName(defaultGrowthRateName);
+  const level = levelFromExperience(growthRateName, mon.experience);
+  return level ? {
+    level,
+    growthRateName,
+    defaultGrowthRateName,
+    growthRateOverride: overrideName,
+    levelOptions: levelOptionsFromExperience(mon.experience, growthRateName),
+  } : null;
+}
+
+function statNatureModifier(natureId, statKey) {
+  if (!Number.isInteger(natureId) || natureId < 0 || natureId > 24) return 1;
+  const up = NATURE_STAT_KEYS[Math.floor(natureId / 5)] ?? null;
+  const down = NATURE_STAT_KEYS[natureId % 5] ?? null;
+  if (up === down) return 1;
+  if (statKey === up) return 1.1;
+  if (statKey === down) return 0.9;
+  return 1;
+}
+
+function calculateStats(mon, baseStats, speciesRecord) {
+  if (!baseStats || !mon?.ivs || !mon?.evs) return null;
+  const level = Number.isInteger(mon.level) && mon.level > 0 ? mon.level : null;
+  if (!level) return null;
+
+  const calcBase = (statKey) => {
+    const base = baseStats[statKey] ?? 0;
+    const iv = mon.ivs[statKey] ?? 0;
+    const ev = mon.evs[statKey] ?? 0;
+    return Math.floor(((base * 2 + iv + Math.floor(ev / 4)) * level) / 100);
+  };
+  const calcStat = (statKey) => {
+    const raw = calcBase(statKey) + 5;
+    return Math.floor(raw * statNatureModifier(mon.natureId, statKey));
+  };
+
+  const maxHP = speciesRecord?.dexID === 292
+    ? 1
+    : calcBase('hp') + level + 10;
+
+  return {
+    level,
+    maxHP,
+    stats: {
+      attack:    calcStat('attack'),
+      defense:   calcStat('defense'),
+      speed:     calcStat('speed'),
+      spAttack:  calcStat('spAttack'),
+      spDefense: calcStat('spDefense'),
+    },
+  };
+}
+
+function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID, growthRateData = null) {
   const speciesRecord = lookupById(data.species, mon.species);
   const speciesName   = getRecordName(speciesRecord);
   const speciesKey    = speciesRecord?.key || speciesName || null;
@@ -206,8 +385,36 @@ function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID) {
     : [];
   const ability = resolveAbility(mon, speciesRecord, data);
 
+  const speciesStats = Array.isArray(speciesRecord?.stats) ? speciesRecord.stats : null;
+  const baseStats = speciesStats ? {
+    hp:        speciesStats[0] ?? 0,
+    attack:    speciesStats[1] ?? 0,
+    defense:   speciesStats[2] ?? 0,
+    speed:     speciesStats[3] ?? 0,
+    spAttack:  speciesStats[4] ?? 0,
+    spDefense: speciesStats[5] ?? 0,
+  } : null;
+  const inferredLevel = inferLevel(mon, speciesRecord, growthRateData, adapterId);
+  const monWithLevel = inferredLevel ? { ...mon, level: inferredLevel.level } : mon;
+  const calculatedStats = calculateStats(monWithLevel, baseStats, speciesRecord);
+  const shouldUseCalculatedStats = calculatedStats && (!mon.stats || mon.maxHP == null);
+
   return {
     ...mon,
+    ...(inferredLevel ? {
+      level: inferredLevel.level,
+      levelEstimated: true,
+      growthRateName: inferredLevel.growthRateName,
+      defaultGrowthRateName: inferredLevel.defaultGrowthRateName,
+      growthRateOverride: inferredLevel.growthRateOverride,
+      levelOptions: inferredLevel.levelOptions,
+    } : {}),
+    ...(shouldUseCalculatedStats ? {
+      level: mon.level ?? calculatedStats.level,
+      maxHP: mon.maxHP ?? calculatedStats.maxHP,
+      stats: mon.stats ?? calculatedStats.stats,
+      statsEstimated: true,
+    } : {}),
     speciesName,
     speciesKey,
     dexId:             speciesRecord?.dexID ?? mon.species,
@@ -219,17 +426,20 @@ function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID) {
     abilityId:         ability.abilityId,
     abilityName:       ability.abilityName,
     abilityCandidates: ability.abilityCandidates,
+    baseStats,
     spriteUrl:          localSpriteUrl(adapterId, mon.species) || defaultSpriteUrl({ speciesName, formName: formSuffix }),
   };
 }
 
-function enrichPc(pc, data, adapterId = DEFAULT_ADAPTER_ID) {
+function enrichPc(pc, data, adapterId = DEFAULT_ADAPTER_ID, growthRateData = null) {
   if (!pc || !Array.isArray(pc.boxes)) return pc ?? null;
   return {
     ...pc,
     boxes: pc.boxes.map((box) => ({
       ...box,
-      pokemon: Array.isArray(box.pokemon) ? box.pokemon.map((mon) => enrichMon(mon, data, adapterId)) : [],
+      pokemon: Array.isArray(box.pokemon)
+        ? box.pokemon.map((mon) => enrichMon(mon, data, adapterId, growthRateData))
+        : [],
     })),
   };
 }
@@ -240,15 +450,15 @@ function enrichStatus(payload) {
   return {
     ...payload,
     adapterId: context.adapter.id,
-    party: payload.party.map((mon) => enrichMon(mon, context.data, context.adapter.id)),
-    pc: enrichPc(payload.pc, context.data, context.adapter.id),
+    party: payload.party.map((mon) => enrichMon(mon, context.data, context.adapter.id, context.growthRateData)),
+    pc: enrichPc(payload.pc, context.data, context.adapter.id, context.growthRateData),
   };
 }
 
 // ---- Nuzlocke state --------------------------------------------------------
 
 function createNuzlockeState() {
-  return { version: 1, mons: {}, locationLimits: {} };
+  return { version: 1, mons: {}, locationLimits: {}, growthRateOverrides: {} };
 }
 
 function loadNuzlockeState() {
@@ -257,6 +467,9 @@ function loadNuzlockeState() {
     version: 1,
     mons: state.mons && typeof state.mons === 'object' ? state.mons : {},
     locationLimits: state.locationLimits && typeof state.locationLimits === 'object' ? state.locationLimits : {},
+    growthRateOverrides: state.growthRateOverrides && typeof state.growthRateOverrides === 'object'
+      ? state.growthRateOverrides
+      : {},
   };
 }
 
@@ -378,11 +591,18 @@ function buildNuzlockeView(status) {
 
 // ── state ─────────────────────────────────────────────────────────────────────
 
+let latestRawPayload = null;
 let latestStatus = null;
 let latestReceivedAt = null;
 
+function rebuildLatestStatus() {
+  if (!latestRawPayload) return;
+  latestStatus = applyNuzlockeState(enrichStatus(latestRawPayload));
+}
+
 function acceptParty(payload) {
-  latestStatus = applyNuzlockeState(enrichStatus(payload));
+  latestRawPayload = payload;
+  rebuildLatestStatus();
   latestReceivedAt = new Date().toISOString();
   const summary = latestStatus.party
     .map((m) => `${m.slot}:${m.speciesName || m.species} Lv${m.level}`)
@@ -562,6 +782,34 @@ const httpServer = http.createServer(async (req, res) => {
       if (!body.key || !Number.isFinite(limit) || limit < 0) throw new Error('Expected { key, limit >= 0 }');
       nuzlockeState.locationLimits[body.key] = Math.floor(limit);
       persistNuzlockeState();
+      sendJson(res, 200, { ok: true });
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+    }
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/nuzlocke/growth-rate') {
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      if (!body.key) throw new Error('Expected { key, growthRateName }');
+      const growthRateName = body.growthRateName == null ? null : canonicalGrowthRateName(String(body.growthRateName));
+      if (growthRateName && !GROWTH_RATE_NAMES.includes(growthRateName)) {
+        throw new Error(`Unknown growthRateName: ${body.growthRateName}`);
+      }
+      const now = new Date().toISOString();
+      if (growthRateName) {
+        nuzlockeState.growthRateOverrides[body.key] = growthRateName;
+      } else {
+        delete nuzlockeState.growthRateOverrides[body.key];
+      }
+      nuzlockeState.mons[body.key] = {
+        ...(nuzlockeState.mons[body.key] || {}),
+        growthRateOverride: growthRateName,
+        updatedAt: now,
+      };
+      persistNuzlockeState();
+      rebuildLatestStatus();
       sendJson(res, 200, { ok: true });
     } catch (error) {
       sendJson(res, 400, { ok: false, error: error.message });
