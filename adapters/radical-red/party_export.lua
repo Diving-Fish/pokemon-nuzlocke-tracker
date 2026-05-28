@@ -4,6 +4,8 @@
 local EXPORT_HOST = "127.0.0.1"
 local EXPORT_PORT = 8765
 local EXPORT_INTERVAL_FRAMES = 60
+local AUTO_SAVE_STATE_PATH = "./autosave.ss1"
+local AUTO_SAVE_INTERVAL_FRAMES = 60 * 60
 
 local PARTY_COUNT_ADDRESS = 0x02024029
 local PARTY_ADDRESS = 0x02024284
@@ -28,6 +30,7 @@ local exporterSocket = nil
 local frameCounter = 0
 local lastPayload = nil
 local lastConnectAttemptFrame = -300
+local lastAutoSaveFrame = 0
 
 local CHARMAP = { [0]=
 	" ", "A", "A", "A", "C", "E", "E", "E", "E", "I", " ", "I", "I", "O", "O", "O",
@@ -611,8 +614,21 @@ local function sendPayload(payload)
 	end
 end
 
+local function maybeAutoSaveState()
+	if frameCounter - lastAutoSaveFrame < AUTO_SAVE_INTERVAL_FRAMES then
+		return
+	end
+	lastAutoSaveFrame = frameCounter
+	if emu:saveStateFile(AUTO_SAVE_STATE_PATH, C.SAVESTATE.ALL) then
+		console:log("Party Export auto-saved state to " .. AUTO_SAVE_STATE_PATH)
+	else
+		console:error("Party Export auto-save failed: " .. AUTO_SAVE_STATE_PATH)
+	end
+end
+
 local function exportParty()
 	frameCounter = frameCounter + 1
+	maybeAutoSaveState()
 	if frameCounter % EXPORT_INTERVAL_FRAMES ~= 0 then
 		return
 	end
@@ -628,7 +644,8 @@ callbacks:add("stop", closeExporterSocket)
 callbacks:add("crashed", closeExporterSocket)
 callbacks:add("reset", function()
 	lastPayload = nil
+	lastAutoSaveFrame = frameCounter
 	closeExporterSocket()
 end)
 
-console:log("Party Export loaded. Start server/index.js on TCP port " .. EXPORT_PORT .. ".")
+console:log("Party Export loaded. Start server/index.js on TCP port " .. EXPORT_PORT .. ". Auto-save path: " .. AUTO_SAVE_STATE_PATH)
