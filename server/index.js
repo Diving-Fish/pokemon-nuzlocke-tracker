@@ -116,6 +116,7 @@ function getAdapterContext(adapterId = DEFAULT_ADAPTER_ID) {
       data,
       growthRateData: loadGrowthRateData(adapter.id),
       translations,
+      moveInfo: buildMoveInfo(data),
       translationsJson: JSON.stringify({
         species: Object.fromEntries(translations.species),
         moves: Object.fromEntries(translations.moves),
@@ -211,6 +212,50 @@ function parseTranslationFile(relativePath, knownNames) {
     }
   }
   return translations;
+}
+
+// English (adapter/ROM) → Chinese, so a custom or type-tweaked move still shows a
+// localized, color-coded type even when it isn't in the official move table.
+const TYPE_NAMES_ZH = {
+  Normal: '一般', Fighting: '格斗', Flying: '飞行', Poison: '毒', Ground: '地面',
+  Rock: '岩石', Bug: '虫', Ghost: '幽灵', Steel: '钢', Fire: '火', Water: '水',
+  Grass: '草', Electric: '电', Psychic: '超能力', Ice: '冰', Dragon: '龙',
+  Dark: '恶', Fairy: '妖精',
+};
+
+const MOVE_CATEGORY_ZH = { physical: '物理', special: '特殊', status: '变化' };
+
+// moves.txt is richer than a plain name list: it carries the Chinese name, type,
+// category, power/accuracy/PP and a Chinese description per move. Radical Red reorders
+// move IDs, so we join to the ROM data by (normalized) English name — the same key the
+// translation parser already uses — rather than by ID.
+function parseMoveInfoFile(relativePath, knownNames) {
+  const info = new Map();
+  const lines = readText(relativePath).split(/\r?\n/);
+  for (const line of lines) {
+    const cells = line.split('\t');
+    if (!/^\d+$/.test((cells[0] || '').trim()) || cells.length < 10) continue;
+    const englishName = knownNames.get(normalizeName(cells[3]));
+    if (!englishName || info.has(englishName)) continue;
+    const clean = (value) => {
+      const text = String(value || '').trim();
+      return text || null;
+    };
+    info.set(englishName, {
+      nameZh: clean(cells[1]),
+      type: clean(cells[4]),
+      category: clean(cells[5]),
+      power: clean(cells[6]),
+      accuracy: clean(cells[7]),
+      pp: clean(cells[8]),
+      description: clean(cells[9]),
+    });
+  }
+  return info;
+}
+
+function buildMoveInfo(data) {
+  return parseMoveInfoFile('data/translates/moves.txt', buildKnownNames(data.moves));
 }
 
 function buildTranslations(data) {
@@ -663,6 +708,7 @@ const httpServer = http.createServer(async (req, res) => {
         dashboard:    'GET  /dashboard',
         nuzlocke:     'GET  /nuzlocke',
         nuzlockeData: 'GET  /nuzlocke/status',
+        nuzlockeMoves: 'GET  /nuzlocke/moves?species=',
         obs:          'GET  /obs',
         status:       'GET  /status',
         latest:       'GET  /party/latest',
@@ -753,6 +799,51 @@ const httpServer = http.createServer(async (req, res) => {
       return;
     }
     sendJson(res, 200, { ok: true, receivedAt: latestReceivedAt, data: buildNuzlockeView(latestStatus) });
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/nuzlocke/moves') {
+    try {
+      const adapterId = url.searchParams.get('adapterId') || latestStatus?.adapterId || DEFAULT_ADAPTER_ID;
+      const speciesId = url.searchParams.get('species');
+      const context = getAdapterContext(adapterId);
+      if (typeof context.adapter.getLearnableMoves !== 'function') {
+        throw new Error('Adapter does not support move lookup');
+      }
+      const learnable = context.adapter.getLearnableMoves(speciesId);
+      if (!learnable) {
+        sendJson(res, 404, { ok: false, error: 'Unknown species' });
+        return;
+      }
+      // Gameplay fields come from the adapter (the live ROM, including custom/tweaked
+      // moves); the official table only supplies the Chinese name/description and fills
+      // any field the adapter left null. type/category are emitted in Chinese for display.
+      const decorate = (move) => {
+        const info = context.moveInfo.get(move.name) || null;
+        const prefer = (adapterValue, officialValue) => (adapterValue != null ? adapterValue : (officialValue ?? null));
+        return {
+          name: move.name,
+          nameZh: info?.nameZh ?? null,
+          type: (move.type != null ? (TYPE_NAMES_ZH[move.type] ?? move.type) : null) ?? info?.type ?? null,
+          category: (move.category != null ? (MOVE_CATEGORY_ZH[move.category] ?? move.category) : null) ?? info?.category ?? null,
+          power: prefer(move.power, info?.power),
+          accuracy: prefer(move.accuracy, info?.accuracy),
+          pp: prefer(move.pp, info?.pp),
+          description: info?.description ?? move.description ?? null,
+          ...(move.level != null ? { level: move.level } : {}),
+        };
+      };
+      sendJson(res, 200, {
+        ok: true,
+        adapterId: context.adapter.id,
+        species: Number(speciesId),
+        levelUpMoves: learnable.levelUpMoves.map(decorate),
+        tmMoves: learnable.tmMoves.map(decorate),
+        tutorMoves: learnable.tutorMoves.map(decorate),
+      });
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+    }
     return;
   }
 

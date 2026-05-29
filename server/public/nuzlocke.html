@@ -1493,6 +1493,321 @@
       display: none;
     }
 
+    /* ============== MOVES MODAL ============== */
+    .moves-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(12, 21, 48, 0.55);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      animation: backdrop-in .18s ease both;
+    }
+
+    @keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+
+    .moves-modal {
+      width: min(620px, 100%);
+      max-height: min(82vh, 760px);
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      border: 4px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 0 12px 0 0 var(--ink-soft), 0 24px 40px rgba(12, 21, 48, 0.35);
+      overflow: hidden;
+      animation: modal-pop .22s cubic-bezier(.2, 1.3, .5, 1) both;
+    }
+
+    @keyframes modal-pop {
+      from { opacity: 0; transform: translateY(16px) scale(.94); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .moves-head {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background:
+        repeating-linear-gradient(45deg, transparent 0, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px),
+        linear-gradient(180deg, var(--ink-mid) 0%, var(--ink) 100%);
+      border-bottom: 4px solid var(--ink);
+    }
+
+    .moves-head .head-sprite {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 auto;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: rgba(255, 252, 239, 0.12);
+      border: 3px solid rgba(255, 252, 239, 0.5);
+      border-radius: 12px;
+      padding: 2px;
+      filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.3));
+    }
+
+    .moves-head .head-text { min-width: 0; flex: 1; }
+
+    .moves-head .head-name {
+      font-family: var(--font-body);
+      font-size: 24px;
+      font-weight: 700;
+      color: #fffcef;
+      letter-spacing: 0.5px;
+      text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .moves-head .head-sub {
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-head);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+    }
+
+    .moves-head .head-lv {
+      padding: 2px 7px;
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 999px;
+      font-size: 10px;
+    }
+
+    .moves-close {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      background: var(--crimson);
+      color: #fffcef;
+      font-family: var(--font-head);
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 0 var(--ink);
+      transition: transform .08s ease, box-shadow .08s ease;
+    }
+
+    .moves-close:hover { transform: translateY(1px); box-shadow: 0 3px 0 0 var(--ink); }
+    .moves-close:active { transform: translateY(4px); box-shadow: 0 0 0 0 var(--ink); }
+
+    .moves-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 16px;
+      display: grid;
+      gap: 18px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-soft) transparent;
+    }
+
+    .moves-body::-webkit-scrollbar { width: 6px; }
+    .moves-body::-webkit-scrollbar-thumb { background: var(--ink-soft); border-radius: 999px; }
+
+    .moves-state {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+      min-height: 180px;
+      font-family: var(--font-body);
+      font-size: 20px;
+      color: var(--ink-soft);
+    }
+
+    .moves-state .pokeball-spin {
+      width: 48px;
+      height: 48px;
+      animation: pokeball-spin 1.8s linear infinite;
+    }
+
+    .move-section .sec-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 3px dashed var(--paper-shadow);
+    }
+
+    .sec-tag {
+      display: inline-grid;
+      place-items: center;
+      height: 26px;
+      padding: 0 12px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      font-family: var(--font-head);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #fffcef;
+      box-shadow: 0 3px 0 0 var(--ink);
+    }
+
+    .sec-tag.lv    { background: var(--leaf-deep); }
+    .sec-tag.tm    { background: var(--sky-accent); }
+    .sec-tag.tutor { background: var(--gold-deep); }
+
+    .sec-zh {
+      font-family: var(--font-body);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .sec-count {
+      margin-left: auto;
+      font-family: var(--font-head);
+      font-size: 11px;
+      color: var(--ink-soft);
+    }
+
+    .move-list { display: grid; gap: 8px; }
+
+    .move-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 6px 10px;
+      padding: 9px 11px;
+      background: linear-gradient(180deg, #ffffff, var(--paper-2));
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      box-shadow: 0 3px 0 0 rgba(27, 45, 79, 0.22);
+    }
+
+    .move-card.has-lv { grid-template-columns: 46px 1fr auto; }
+
+    .move-lv {
+      grid-row: span 2;
+      align-self: stretch;
+      display: grid;
+      place-items: center;
+      min-height: 38px;
+      border-radius: 8px;
+      background: var(--gold-bg);
+      border: 2px solid var(--gold-deep);
+      font-family: var(--font-head);
+      font-size: 13px;
+      color: var(--gold-deep);
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .move-lv .lv-cap { font-size: 8px; display: block; color: var(--ink-soft); letter-spacing: 1px; }
+    .move-lv.evo { font-size: 13px; }
+
+    .move-main { min-width: 0; }
+
+    .move-name-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .move-zh {
+      font-family: var(--font-body);
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .move-en {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--ink-faint);
+      letter-spacing: 0.5px;
+    }
+
+    .move-desc {
+      grid-column: 1 / 3;
+      margin-top: 3px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+
+    .move-card.has-lv .move-desc { grid-column: 2 / 4; }
+
+    .move-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      flex: 0 0 auto;
+    }
+
+    .type-chip {
+      display: inline-grid;
+      place-items: center;
+      height: 24px;
+      min-width: 40px;
+      padding: 0 9px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fffcef;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
+    }
+
+    .cat-chip {
+      display: inline-grid;
+      place-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .cat-chip.phys { background: #ffd9c2; }
+    .cat-chip.spec { background: #c9e2ff; }
+    .cat-chip.stat { background: #e4e7ee; }
+    .cat-chip.dyna { background: #ffd6ec; }
+
+    .move-stats {
+      font-family: var(--font-num);
+      font-size: 14px;
+      color: var(--ink-mid);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .move-stats b { color: var(--ink); }
+
+    .move-empty {
+      padding: 10px 12px;
+      border: 3px dashed var(--paper-shadow);
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 17px;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+
     @media (max-width: 640px) {
       .shell { width: calc(100% - 20px); padding-top: 22px; }
       .brand-text h1 { font-size: 22px; text-shadow: 2px 2px 0 var(--gold), 4px 4px 0 var(--ink-soft); }
@@ -1516,6 +1831,13 @@
       .detail-nav { width: 36px; height: 44px; font-size: 14px; }
       .detail-nav-left  { left: 6px; }
       .detail-nav-right { right: 6px; }
+      .moves-backdrop { padding: 10px; }
+      .moves-modal { max-height: 90vh; }
+      .moves-head .head-sprite { width: 52px; height: 52px; }
+      .moves-head .head-name { font-size: 20px; }
+      .move-card { grid-template-columns: 40px 1fr auto; padding: 8px; }
+      .move-zh { font-size: 17px; }
+      .move-desc { font-size: 14px; }
     }
   </style>
 </head>
@@ -1740,6 +2062,7 @@
       @click.stop
     >
       <button class="menu-item" @click="openDetail(menu.mon)">查看详情</button>
+      <button class="menu-item" @click="viewMoves(menu.mon)">查看技能</button>
       <button class="menu-item" @click="setDead(menu.mon, !menu.mon.dead)">
         {{ menu.mon.dead ? '复活' : '标记死亡' }}
       </button>
@@ -1947,6 +2270,90 @@
         </div>
       </div>
     </div>
+
+    <!-- ===================== MOVES MODAL ===================== -->
+    <div v-if="moves.open" class="moves-backdrop" @click.self="closeMoves">
+      <div class="moves-modal" role="dialog" aria-modal="true">
+        <div class="moves-head">
+          <img
+            v-if="moves.mon"
+            class="head-sprite"
+            :src="spriteUrl(moves.mon)"
+            :alt="displayName(moves.mon)"
+          >
+          <div class="head-text">
+            <div class="head-name">{{ moves.mon ? displayName(moves.mon) : '' }}</div>
+            <div class="head-sub">
+              <span>MOVES · 技能学习</span>
+              <span v-if="moves.mon && levelText(moves.mon)" class="head-lv">{{ levelText(moves.mon) }}</span>
+            </div>
+          </div>
+          <button class="moves-close" @click="closeMoves" aria-label="close">✕</button>
+        </div>
+
+        <div class="moves-body">
+          <div v-if="moves.loading" class="moves-state">
+            <svg class="pokeball-spin" viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="28" fill="#fffcef" stroke="#1b2d4f" stroke-width="4"/>
+              <path d="M4 32 a28 28 0 0 1 56 0 Z" fill="#dc0a2d" stroke="#1b2d4f" stroke-width="4"/>
+              <line x1="6" y1="32" x2="58" y2="32" stroke="#1b2d4f" stroke-width="4"/>
+              <circle cx="32" cy="32" r="7.5" fill="#fffcef" stroke="#1b2d4f" stroke-width="4"/>
+            </svg>
+            <span>读取技能数据…</span>
+          </div>
+
+          <div v-else-if="moves.error" class="moves-state">⚠ {{ moves.error }}</div>
+
+          <template v-else>
+            <section
+              v-for="sec in moveSections"
+              :key="sec.id"
+              class="move-section"
+            >
+              <div class="sec-head">
+                <span class="sec-tag" :class="sec.id">{{ sec.en }}</span>
+                <span class="sec-zh">{{ sec.zh }}</span>
+                <span class="sec-count">{{ sec.list.length }}</span>
+              </div>
+
+              <div class="move-list" v-if="sec.list.length">
+                <div class="move-card" :class="{ 'has-lv': sec.id === 'lv' }" v-for="(mv, i) in sec.list" :key="sec.id + '-' + i">
+                  <div
+                    v-if="sec.id === 'lv'"
+                    class="move-lv"
+                    :class="{ evo: mv.level === 0 }"
+                  >
+                    <template v-if="mv.level === 0">进化</template>
+                    <template v-else><span class="lv-cap">LV</span>{{ mv.level }}</template>
+                  </div>
+
+                  <div class="move-main">
+                    <div class="move-name-row">
+                      <span class="move-zh">{{ moveName(mv) }}</span>
+                      <span class="move-en" v-if="moveName(mv) !== mv.name">{{ mv.name }}</span>
+                    </div>
+                  </div>
+
+                  <div class="move-meta">
+                    <span class="type-chip" v-if="mv.type" :style="{ background: typeColor(mv.type) }">{{ mv.type }}</span>
+                    <span class="cat-chip" :class="catClass(mv.category)" v-if="mv.category">{{ mv.category }}</span>
+                  </div>
+
+                  <div class="move-desc" v-if="mv.description || mv.power || mv.pp || mv.accuracy">
+                    <span class="move-stats" v-if="mv.power || mv.pp || mv.accuracy">
+                      威力 <b>{{ mv.power || '—' }}</b> · 命中 <b>{{ mv.accuracy || '—' }}</b> · PP <b>{{ mv.pp || '—' }}</b>
+                    </span>
+                    <template v-if="mv.description"><br v-if="mv.power || mv.pp || mv.accuracy">{{ mv.description }}</template>
+                  </div>
+                </div>
+              </div>
+
+              <div class="move-empty" v-else>暂无{{ sec.zh }}</div>
+            </section>
+          </template>
+        </div>
+      </div>
+    </div>
   </v-app>
 </div>
 
@@ -2007,6 +2414,14 @@ createApp({
       rollTimer: null,
       pendingLimits: {},
       detail: { mon: null, mode: 'actual' },
+      moves: { open: false, mon: null, loading: false, error: '', data: null },
+      typeColors: {
+        '一般': '#9fa19f', '格斗': '#ce4069', '飞行': '#8fa8dd', '毒': '#aa6bc8',
+        '地面': '#d97746', '岩石': '#c7b78b', '虫': '#90c12c', '幽灵': '#5269ac',
+        '钢': '#5a8ea1', '火': '#ff9c54', '水': '#4d90d5', '草': '#63bb5b',
+        '电': '#e0b91e', '超能力': '#f97176', '冰': '#5bbfb4', '龙': '#0a6dc4',
+        '恶': '#5a5366', '妖精': '#e87fdf',
+      },
       statKeys: STAT_KEYS,
       statDisplayKeys: STAT_DISPLAY_KEYS,
       statModes: STAT_MODES,
@@ -2077,6 +2492,14 @@ createApp({
     radarPoints() {
       return this.radarDots.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
     },
+    moveSections() {
+      const data = this.moves.data;
+      return [
+        { id: 'lv',    en: 'LEVEL-UP', zh: '升级技能',   list: data?.levelUpMoves ?? [] },
+        { id: 'tm',    en: 'TM',       zh: '招式学习器', list: data?.tmMoves ?? [] },
+        { id: 'tutor', en: 'TUTOR',    zh: '教学技能',   list: data?.tutorMoves ?? [] },
+      ];
+    },
   },
 
   mounted() {
@@ -2085,7 +2508,8 @@ createApp({
     setInterval(this.refresh, 1000);
     window.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
-      if (this.detail.mon) this.closeDetail();
+      if (this.moves.open) this.closeMoves();
+      else if (this.detail.mon) this.closeDetail();
       else this.closeMenu();
     });
     // Vuetify teleports overlays outside #app, so binding closeMenu on #app
@@ -2197,7 +2621,7 @@ createApp({
       this.menu = {
         mon,
         x: Math.min(event.clientX, window.innerWidth - 196),
-        y: Math.min(event.clientY, window.innerHeight - 110),
+        y: Math.min(event.clientY, window.innerHeight - 150),
       };
     },
 
@@ -2215,6 +2639,43 @@ createApp({
 
     closeDetail() {
       this.detail.mon = null;
+    },
+
+    async viewMoves(mon) {
+      this.closeMenu();
+      this.moves = { open: true, mon, loading: true, error: '', data: null };
+      try {
+        const params = new URLSearchParams({ species: String(mon.species) });
+        if (this.view?.adapterId) params.set('adapterId', this.view.adapterId);
+        const res = await fetch('/nuzlocke/moves?' + params.toString(), { cache: 'no-store' });
+        const body = await res.json();
+        if (!res.ok || !body.ok) throw new Error(body.error || ('HTTP ' + res.status));
+        if (this.moves.mon === mon) {
+          this.moves.data = body;
+          this.moves.loading = false;
+        }
+      } catch (error) {
+        if (this.moves.mon === mon) {
+          this.moves.error = error.message;
+          this.moves.loading = false;
+        }
+      }
+    },
+
+    closeMoves() {
+      this.moves = { open: false, mon: null, loading: false, error: '', data: null };
+    },
+
+    moveName(mv) {
+      return mv.nameZh || this.t('moves', mv.name) || mv.name;
+    },
+
+    typeColor(type) {
+      return this.typeColors[type] || '#9fa19f';
+    },
+
+    catClass(category) {
+      return { '物理': 'phys', '特殊': 'spec', '变化': 'stat', '极巨': 'dyna' }[category] || 'stat';
     },
 
     navigateDetail(delta) {

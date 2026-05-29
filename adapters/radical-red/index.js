@@ -39,6 +39,66 @@ function getSprite(speciesId) {
   return typeof sprite === 'string' && sprite.startsWith('data:image/png;base64,') ? sprite : null;
 }
 
+// split is the ROM's name for what the games now call the damage category.
+const MOVE_CATEGORY_BY_SPLIT = ['physical', 'special', 'status'];
+
+function typeName(typeId) {
+  return DATA.types?.[String(typeId)]?.name ?? null;
+}
+
+// Resolve a move to the ROM's actual data. Radical Red adds custom moves (e.g. Aqua
+// Fang) and tweaks the power/accuracy of existing ones, so these fields are the source
+// of truth — the server only layers Chinese name/description on top and fills any gaps.
+function moveEntry(moveId) {
+  const move = DATA.moves?.[String(moveId)];
+  if (!move || !move.name) return null;
+  return {
+    name: move.name,
+    type: typeName(move.type),
+    category: MOVE_CATEGORY_BY_SPLIT[move.split] ?? null,
+    power: Number.isFinite(move.power) ? move.power : null,
+    accuracy: Number.isFinite(move.accuracy) ? move.accuracy : null,
+    pp: Number.isFinite(move.pp) ? move.pp : null,
+    description: move.description ?? null,
+  };
+}
+
+// A species' learnable moves, each carrying the ROM's gameplay fields. Entries are
+// deduplicated by name; for level-up moves the lowest level the move first appears at
+// is kept.
+function getLearnableMoves(speciesId) {
+  const species = DATA.species?.[String(speciesId)];
+  if (!species) return null;
+
+  const levelUpSeen = new Set();
+  const levelUpMoves = [];
+  for (const entry of Array.isArray(species.levelupMoves) ? species.levelupMoves : []) {
+    const [id, level] = Array.isArray(entry) ? entry : [entry, 0];
+    const move = moveEntry(id);
+    if (!move || levelUpSeen.has(move.name)) continue;
+    levelUpSeen.add(move.name);
+    levelUpMoves.push({ ...move, level: Number(level) || 0 });
+  }
+
+  const entriesOf = (ids) => {
+    const seen = new Set();
+    const out = [];
+    for (const id of Array.isArray(ids) ? ids : []) {
+      const move = moveEntry(id);
+      if (!move || seen.has(move.name)) continue;
+      seen.add(move.name);
+      out.push(move);
+    }
+    return out;
+  };
+
+  return {
+    levelUpMoves,
+    tmMoves: entriesOf(species.tmMoves),
+    tutorMoves: entriesOf(species.tutorMoves),
+  };
+}
+
 function resolveLocationName(mon) {
   const mapsecId = mon.metMapsec ?? mon.metLocation ?? null;
   return mapsecId != null ? (MAPSEC_NAMES[String(mapsecId)] ?? null) : null;
@@ -114,6 +174,7 @@ module.exports = {
   dataJsPath: DATA_JS_PATH,
   loadData,
   getSprite,
+  getLearnableMoves,
   processPayload,
 };
 
