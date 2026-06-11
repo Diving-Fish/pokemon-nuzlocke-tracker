@@ -4,7 +4,10 @@
 local EXPORT_HOST = "127.0.0.1"
 local EXPORT_PORT = 8765
 local EXPORT_INTERVAL_FRAMES = 60
-local AUTO_SAVE_STATE_PATH = "./autosave.ss1"
+local AUTO_SAVE_STATE_DIR = "."
+local AUTO_SAVE_STATE_PREFIX = "autosave"
+local AUTO_SAVE_STATE_MANIFEST = "./autosave-manifest.txt"
+local AUTO_SAVE_STATE_KEEP = 50
 local AUTO_SAVE_INTERVAL_FRAMES = 60 * 60
 
 local PARTY_COUNT_ADDRESS = 0x02024029
@@ -31,6 +34,8 @@ local frameCounter = 0
 local lastPayload = nil
 local lastConnectAttemptFrame = -300
 local lastAutoSaveFrame = 0
+local autoSaveManifest = nil
+local autoSavePruneWarningShown = false
 
 local CHARMAP = { [0]=
 	" ", "A", "A", "A", "C", "E", "E", "E", "E", "I", " ", "I", "I", "O", "O", "O",
@@ -614,15 +619,87 @@ local function sendPayload(payload)
 	end
 end
 
+local function autoSavePath(filename)
+	if AUTO_SAVE_STATE_DIR == "." or AUTO_SAVE_STATE_DIR == "" then
+		return "./" .. filename
+	end
+	return AUTO_SAVE_STATE_DIR .. "/" .. filename
+end
+
+local function loadAutoSaveManifest()
+	if autoSaveManifest then
+		return autoSaveManifest
+	end
+
+	autoSaveManifest = {}
+	if not io or not io.open then
+		return autoSaveManifest
+	end
+	local file = io.open(AUTO_SAVE_STATE_MANIFEST, "r")
+	if not file then
+		return autoSaveManifest
+	end
+
+	for line in file:lines() do
+		if line ~= "" then
+			table.insert(autoSaveManifest, line)
+		end
+	end
+	file:close()
+	return autoSaveManifest
+end
+
+local function writeAutoSaveManifest(entries)
+	if not io or not io.open then
+		if not autoSavePruneWarningShown then
+			console:warn("Party Export cannot prune auto-saves because Lua file I/O is unavailable.")
+			autoSavePruneWarningShown = true
+		end
+		return
+	end
+	local file, err = io.open(AUTO_SAVE_STATE_MANIFEST, "w")
+	if not file then
+		console:warn("Party Export could not write auto-save manifest: " .. tostring(err))
+		return
+	end
+	for _, path in ipairs(entries) do
+		file:write(path .. "\n")
+	end
+	file:close()
+end
+
+local function rememberAutoSave(path)
+	local entries = loadAutoSaveManifest()
+	table.insert(entries, path)
+	while #entries > AUTO_SAVE_STATE_KEEP do
+		local oldPath = table.remove(entries, 1)
+		if not os or not os.remove then
+			if not autoSavePruneWarningShown then
+				console:warn("Party Export cannot prune auto-saves because os.remove is unavailable.")
+				autoSavePruneWarningShown = true
+			end
+			break
+		end
+		local ok, err = os.remove(oldPath)
+		if not ok then
+			console:warn("Party Export could not prune old auto-save " .. oldPath .. ": " .. tostring(err))
+		end
+	end
+	writeAutoSaveManifest(entries)
+end
+
 local function maybeAutoSaveState()
 	if frameCounter - lastAutoSaveFrame < AUTO_SAVE_INTERVAL_FRAMES then
 		return
 	end
 	lastAutoSaveFrame = frameCounter
-	if emu:saveStateFile(AUTO_SAVE_STATE_PATH, C.SAVESTATE.ALL) then
-		console:log("Party Export auto-saved state to " .. AUTO_SAVE_STATE_PATH)
+	local timestamp = os and os.date and os.date("%Y%m%d-%H%M%S") or tostring(frameCounter)
+	local path = autoSavePath(string.format("%s-%s-f%08d.ss1", AUTO_SAVE_STATE_PREFIX, timestamp, frameCounter))
+	if emu:saveStateFile(path, C.SAVESTATE.ALL) then
+		rememberAutoSave(path)
+		console:log("Party Export auto-saved state to " .. path)
 	else
-		console:error("Party Export auto-save failed: " .. AUTO_SAVE_STATE_PATH)
+		console:error("Party Export auto-save failed: " .. path)
 	end
 end
 
@@ -648,4 +725,4 @@ callbacks:add("reset", function()
 	closeExporterSocket()
 end)
 
-console:log("Party Export loaded. Start server/index.js on TCP port " .. EXPORT_PORT .. ". Auto-save path: " .. AUTO_SAVE_STATE_PATH)
+console:log("Party Export loaded. Start server/index.js on TCP port " .. EXPORT_PORT .. ". Auto-save keeps the latest " .. AUTO_SAVE_STATE_KEEP .. " timestamped states.")
