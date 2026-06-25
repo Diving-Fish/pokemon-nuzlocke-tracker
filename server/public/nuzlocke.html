@@ -1456,6 +1456,164 @@
       border-radius: 10px;
     }
 
+    /* ============== EDIT / CHEAT PANEL ============== */
+    .edit-head { cursor: pointer; user-select: none; }
+
+    .edit-toggle {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: #fffcef;
+    }
+
+    .edit-body { display: grid; gap: 16px; }
+
+    .edit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .edit-field { display: flex; flex-direction: column; gap: 5px; }
+    .edit-field-wide { grid-column: 1 / -1; }
+
+    .edit-label {
+      font-family: var(--font-head);
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--ink-mid);
+    }
+
+    .edit-input {
+      height: 38px;
+      padding: 0 10px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 18px;
+      width: 100%;
+    }
+
+    .edit-input:focus {
+      outline: none;
+      border-color: var(--gold-deep);
+      box-shadow: 0 0 0 3px var(--gold-bg);
+    }
+
+    .edit-stat-block {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .edit-stat-col {
+      border: 3px solid var(--ink);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: var(--paper);
+    }
+
+    .edit-stat-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      font-family: var(--font-head);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--ink-mid);
+      margin-bottom: 10px;
+    }
+
+    .edit-stat-title span { color: var(--ink-faint); font-size: 10px; letter-spacing: 0.5px; }
+
+    .edit-stat-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 64px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .edit-stat-name {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    /* Pixel-flavored range sliders for EV/IV. accent-color tints the filled track + thumb. */
+    .edit-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--paper-shadow);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .edit-slider.ev { accent-color: var(--leaf); }
+    .edit-slider.iv { accent-color: var(--sky-accent); }
+
+    .edit-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 0 0 var(--ink-soft);
+    }
+
+    .edit-slider.ev::-webkit-slider-thumb { background: var(--leaf); }
+    .edit-slider.iv::-webkit-slider-thumb { background: var(--sky-accent); }
+
+    .edit-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .edit-num {
+      width: 64px;
+      height: 30px;
+      padding: 0 6px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-family: var(--font-num);
+      font-size: 16px;
+      text-align: right;
+    }
+
+    .edit-num:focus {
+      outline: none;
+      border-color: var(--gold-deep);
+      box-shadow: 0 0 0 3px var(--gold-bg);
+    }
+
+    .edit-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .edit-msg { font-family: var(--font-body); font-size: 16px; margin-right: auto; }
+    .edit-msg.error { color: var(--crimson-deep); }
+    .edit-msg.ok { color: var(--leaf-deep); }
+    .edit-msg.hint { color: var(--ink-faint); }
+
+    .edit-save { min-width: 92px; }
+
     /* ============== RESPONSIVE ============== */
     @media (max-width: 1080px) {
       .layout { grid-template-columns: 1fr; }
@@ -1918,7 +2076,7 @@
           <div class="pokemon-grid" v-if="pokemon.length">
             <v-tooltip
               v-for="mon in pokemon"
-              :key="mon.nuzlockeKey"
+              :key="gridKey(mon)"
               content-class="mon-tooltip"
               location="top"
               open-delay="120"
@@ -1935,11 +2093,11 @@
                   <span class="source-badge" v-if="mon.source === 'party'">{{ mon.slot }}</span>
                   <span class="dead-badge" v-if="mon.dead">DEAD</span>
                   <img
-                    v-if="!imgErrors[mon.nuzlockeKey]"
+                    v-if="!imgErrors[mon.species]"
                     class="sprite"
                     :src="spriteUrl(mon)"
                     :alt="displayName(mon)"
-                    @error="imgErrors[mon.nuzlockeKey] = true"
+                    @error="imgErrors[mon.species] = true"
                   >
                   <span v-else class="fallback">{{ initials(mon) }}</span>
                 </div>
@@ -1998,7 +2156,7 @@
                   <div class="loc-mons">
                     <img
                       v-for="mon in loc.pokemon"
-                      :key="mon.nuzlockeKey"
+                      :key="gridKey(mon)"
                       class="mini-sprite"
                       :class="{ dead: mon.dead }"
                       :src="spriteUrl(mon)"
@@ -2062,6 +2220,7 @@
       @click.stop
     >
       <button class="menu-item" @click="openDetail(menu.mon)">查看详情</button>
+      <button class="menu-item" @click="openEditor(menu.mon)">修改属性</button>
       <button class="menu-item" @click="viewMoves(menu.mon)">查看技能</button>
       <button class="menu-item" @click="setDead(menu.mon, !menu.mon.dead)">
         {{ menu.mon.dead ? '复活' : '标记死亡' }}
@@ -2105,11 +2264,11 @@
           <div class="detail-id" :class="{ dead: detail.mon.dead }">
             <div class="detail-sprite-wrap">
               <img
-                v-if="!imgErrors[detail.mon.nuzlockeKey]"
+                v-if="!imgErrors[detail.mon.species]"
                 class="detail-sprite"
                 :src="spriteUrl(detail.mon)"
                 :alt="displayName(detail.mon)"
-                @error="imgErrors[detail.mon.nuzlockeKey] = true"
+                @error="imgErrors[detail.mon.species] = true"
               >
               <span v-else class="fallback">{{ initials(detail.mon) }}</span>
             </div>
@@ -2267,6 +2426,62 @@
               </div>
             </div>
           </section>
+
+          <!-- Cheat / editor -->
+          <section class="detail-section edit-section">
+            <header class="detail-section-head edit-head" @click="edit.open = !edit.open">
+              <span>EDIT</span>
+              <span class="edit-toggle">{{ edit.open ? '收起 ▲' : '展开 ▼' }}</span>
+            </header>
+            <div v-if="edit.open" class="detail-section-body edit-body">
+              <div class="edit-grid">
+                <label class="edit-field">
+                  <span class="edit-label">等级</span>
+                  <input class="edit-input" type="number" min="1" max="100" v-model="edit.level">
+                </label>
+                <label class="edit-field">
+                  <span class="edit-label">性格</span>
+                  <select class="edit-input" v-model="edit.nature">
+                    <option v-for="opt in natureOptions" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
+                  </select>
+                </label>
+                <label class="edit-field edit-field-wide">
+                  <span class="edit-label">特性</span>
+                  <select class="edit-input" v-model="edit.ability">
+                    <option v-for="opt in abilityOptions(detail.mon)" :key="opt.slot" :value="opt.slot">{{ opt.label }}</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="edit-stat-block">
+                <div class="edit-stat-col">
+                  <div class="edit-stat-title">努力值 EV <span>合计 {{ evTotal }} / 510 · 步长 4</span></div>
+                  <div class="edit-stat-row" v-for="stat in editStatKeys" :key="'ev-' + stat.key">
+                    <span class="edit-stat-name">{{ stat.zh }}</span>
+                    <input class="edit-slider ev" type="range" min="0" max="252" step="4" v-model.number="edit.evs[stat.key]">
+                    <input class="edit-num" type="number" min="0" max="252" step="4" v-model.number="edit.evs[stat.key]">
+                  </div>
+                </div>
+                <div class="edit-stat-col">
+                  <div class="edit-stat-title">个体值 IV <span>0–31 · 步长 1</span></div>
+                  <div class="edit-stat-row" v-for="stat in editStatKeys" :key="'iv-' + stat.key">
+                    <span class="edit-stat-name">{{ stat.zh }}</span>
+                    <input class="edit-slider iv" type="range" min="0" max="31" step="1" v-model.number="edit.ivs[stat.key]">
+                    <input class="edit-num" type="number" min="0" max="31" step="1" v-model.number="edit.ivs[stat.key]">
+                  </div>
+                </div>
+              </div>
+
+              <div class="edit-actions">
+                <span v-if="edit.error" class="edit-msg error">⚠ {{ edit.error }}</span>
+                <span v-else-if="edit.notice" class="edit-msg ok">{{ edit.notice }}</span>
+                <span v-else class="edit-msg hint">直接写入运行中的 mGBA 内存</span>
+                <button class="gba-btn edit-save" :disabled="edit.saving" @click="saveEdit">
+                  {{ edit.saving ? '写入中…' : '写入' }}
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -2398,6 +2613,43 @@ const STAT_MODES = [
   { key: 'iv',     en: 'IV',     zh: '个体值',   color: '#2b7fd6', colorDeep: '#1d5fa0', max: 31  },
 ];
 
+// Nature ids 0-24 in the canonical Gen 3 order (matches the adapter's table).
+const NATURE_NAMES_ZH = [
+  '勤奋', '怕寂寞', '勇敢', '固执', '顽皮',
+  '大胆', '坦率', '悠闲', '淘气', '乐天',
+  '胆小', '急躁', '认真', '爽朗', '天真',
+  '内敛', '慢吞吞', '冷静', '害羞', '马虎',
+  '温和', '温顺', '自大', '慎重', '浮躁',
+];
+
+// The six EV/IV keys in the editor's display order, with labels.
+const EDIT_STAT_KEYS = [
+  { key: 'hp',        zh: 'HP'  },
+  { key: 'attack',    zh: '攻击' },
+  { key: 'defense',   zh: '防御' },
+  { key: 'spAttack',  zh: '特攻' },
+  { key: 'spDefense', zh: '特防' },
+  { key: 'speed',     zh: '速度' },
+];
+
+function blankEvIv() {
+  return { hp: 0, attack: 0, defense: 0, speed: 0, spAttack: 0, spDefense: 0 };
+}
+
+function blankEdit() {
+  return {
+    open: false,
+    saving: false,
+    error: '',
+    notice: '',
+    level: '',
+    nature: '',
+    ability: '',
+    evs: blankEvIv(),
+    ivs: blankEvIv(),
+  };
+}
+
 createApp({
   data() {
     return {
@@ -2414,6 +2666,9 @@ createApp({
       rollTimer: null,
       pendingLimits: {},
       detail: { mon: null, mode: 'actual' },
+      edit: blankEdit(),
+      natureNames: NATURE_NAMES_ZH,
+      editStatKeys: EDIT_STAT_KEYS,
       moves: { open: false, mon: null, loading: false, error: '', data: null },
       typeColors: {
         '一般': '#9fa19f', '格斗': '#ce4069', '飞行': '#8fa8dd', '毒': '#aa6bc8',
@@ -2492,6 +2747,22 @@ createApp({
     radarPoints() {
       return this.radarDots.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
     },
+    // Nature options annotated with the stat they raise/lower, e.g. "固执（+攻击 -特攻）".
+    natureOptions() {
+      const stats = ['攻击', '防御', '速度', '特攻', '特防'];
+      return this.natureNames.map((name, id) => {
+        const up = Math.floor(id / 5);
+        const down = id % 5;
+        const suffix = up === down ? '（平衡）' : `（+${stats[up]} -${stats[down]}）`;
+        return { id, label: name + suffix };
+      });
+    },
+
+    evTotal() {
+      return ['hp', 'attack', 'defense', 'speed', 'spAttack', 'spDefense']
+        .reduce((sum, key) => sum + (Number(this.edit.evs?.[key]) || 0), 0);
+    },
+
     moveSections() {
       const data = this.moves.data;
       return [
@@ -2526,7 +2797,11 @@ createApp({
     pokemon(list) {
       if (!this.detail.mon) return;
       // Keep detail view in sync with the latest server data for the same mon.
-      const fresh = list.find((m) => m.nuzlockeKey === this.detail.mon.nuzlockeKey);
+      // Editing nature/ability rewrites the personality (the identity key), so fall
+      // back to the stable OT id + species pair to avoid the modal closing on save.
+      const cur = this.detail.mon;
+      const fresh = list.find((m) => m.nuzlockeKey === cur.nuzlockeKey)
+        || list.find((m) => m.otId === cur.otId && m.species === cur.species);
       this.detail.mon = fresh || null;
     },
   },
@@ -2634,11 +2909,81 @@ createApp({
       // Prefer the first mode that actually has data for this mon.
       const preferred = ['actual', 'base', 'ev', 'iv'];
       this.detail.mode = preferred.find((mode) => this.statValuesFor(mon, mode)) || 'actual';
+      this.resetEdit(mon);
       this.closeMenu();
+    },
+
+    openEditor(mon) {
+      this.openDetail(mon);
+      this.edit.open = true;
     },
 
     closeDetail() {
       this.detail.mon = null;
+      this.edit = blankEdit();
+    },
+
+    // Seed the editor form from the mon's current values so opening it shows the
+    // live state; the user only changes what they want.
+    resetEdit(mon) {
+      const copy = (src) => ({
+        hp: src?.hp ?? 0, attack: src?.attack ?? 0, defense: src?.defense ?? 0,
+        speed: src?.speed ?? 0, spAttack: src?.spAttack ?? 0, spDefense: src?.spDefense ?? 0,
+      });
+      this.edit = {
+        ...blankEdit(),
+        level: mon?.level ?? '',
+        nature: mon?.natureId ?? '',
+        ability: this.currentAbilitySlot(mon),
+        evs: copy(mon?.evs),
+        ivs: copy(mon?.ivs),
+      };
+    },
+
+    currentAbilitySlot(mon) {
+      if (!mon) return '';
+      if (mon.hiddenAbility) return 'hidden';
+      return mon.abilityNum ? 'second' : 'first';
+    },
+
+    abilityOptions(mon) {
+      const candidates = Array.isArray(mon?.abilityCandidates) ? mon.abilityCandidates : [];
+      const slotZh = { first: '特性1', second: '特性2', hidden: '隐藏特性' };
+      return candidates.map((candidate) => ({
+        slot: candidate.slot,
+        label: `${slotZh[candidate.slot] || candidate.slot} · ${this.t('abilities', candidate.abilityName) || candidate.abilityName}`,
+      }));
+    },
+
+    async saveEdit() {
+      const mon = this.detail.mon;
+      if (!mon) return;
+      this.edit.saving = true;
+      this.edit.error = '';
+      this.edit.notice = '';
+      const changes = {};
+      const level = Number(this.edit.level);
+      if (Number.isFinite(level) && level >= 1 && level <= 100 && level !== mon.level) changes.level = level;
+      const nature = Number(this.edit.nature);
+      if (Number.isInteger(nature) && nature >= 0 && nature <= 24 && nature !== mon.natureId) changes.nature = nature;
+      if (this.edit.ability && this.edit.ability !== this.currentAbilitySlot(mon)) changes.ability = this.edit.ability;
+      changes.evs = { ...this.edit.evs };
+      changes.ivs = { ...this.edit.ivs };
+      try {
+        const res = await fetch('/nuzlocke/edit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ key: mon.nuzlockeKey, changes }),
+        });
+        const body = await res.json();
+        if (!res.ok || !body.ok) throw new Error(body.error || ('HTTP ' + res.status));
+        this.edit.notice = '已写入 mGBA ✓';
+        await this.refresh();
+      } catch (error) {
+        this.edit.error = error.message;
+      } finally {
+        this.edit.saving = false;
+      }
     },
 
     async viewMoves(mon) {
@@ -2685,6 +3030,7 @@ createApp({
       if (idx < 0) return;
       const next = list[(idx + delta + list.length) % list.length];
       this.detail.mon = next;
+      this.resetEdit(next);
       // Preserve the current mode if the new mon has data for it; otherwise
       // fall back to the first mode that does.
       if (!this.statValuesFor(next, this.detail.mode)) {
@@ -2756,6 +3102,13 @@ createApp({
         this.rollResult = Math.floor(Math.random() * this.rollMax) + 1;
         this.rolling = false;
       }, 1000);
+    },
+
+    // A stable key tied to the mon's physical slot, not its personality. Editing
+    // nature/ability rewrites the personality (and thus nuzlockeKey); keying the grid
+    // by that would remount the tile and briefly flash the sprite fallback.
+    gridKey(mon) {
+      return mon.slot != null ? `party:${mon.slot}` : `box:${mon.box}:${mon.position}`;
     },
 
     displayName(mon) {

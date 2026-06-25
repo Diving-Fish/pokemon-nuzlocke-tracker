@@ -356,6 +356,37 @@ function levelOptionsFromExperience(experience, selectedGrowthRateName = null) {
   })).filter((option) => option.level);
 }
 
+// Growth rate for any mon (party mons don't carry an inferred growthRateName since
+// their level comes straight from RAM). Mirrors the resolution inside inferLevel.
+function resolveGrowthRateName(mon, growthRateData, adapterId) {
+  if (!growthRateData) return null;
+  const overrideName = nuzlockeState?.growthRateOverrides?.[monIdentity(mon, adapterId)] || null;
+  const dexId = mon?.dexId ?? mon?.species;
+  const growthRateId = growthRateData.speciesGrowthRateIds.get(Number(dexId));
+  const defaultGrowthRateName = growthRateData.growthRateNames.get(growthRateId);
+  return overrideName || canonicalGrowthRateName(defaultGrowthRateName) || null;
+}
+
+// Find a 32-bit personality whose nature (p % 25) and ability slot bit (p & 1) match
+// the desired values, preferring the smallest value at/above `base`. Nature and parity
+// are coprime cycles (lengths 25 and 2), so any 50 consecutive non-wrapping integers
+// cover every (nature, parity) combo. We avoid wrapping mid-search because 2^32 is not
+// a multiple of 50, which would skip residues; if `base` sits within 50 of the ceiling
+// we fall back to the [0, 49] window, which always contains a match. Changing
+// personality can also shift gender/shininess — an accepted side effect of a cheat tool.
+function personalityForNatureAndAbility(base, nature, abilityBit) {
+  const TOP = 0x100000000;
+  const start = base >>> 0;
+  for (let k = 0; k < 50; k++) {
+    const p = start + k;
+    if (p < TOP && p % 25 === nature && (p & 1) === abilityBit) return p >>> 0;
+  }
+  for (let p = 0; p < 50; p++) {
+    if (p % 25 === nature && (p & 1) === abilityBit) return p;
+  }
+  return start;
+}
+
 function inferLevel(mon, speciesRecord, growthRateData, adapterId) {
   if (!growthRateData || Number.isInteger(mon.level)) return null;
   const overrideName = nuzlockeState?.growthRateOverrides?.[monIdentity(mon, adapterId)] || null;
@@ -558,6 +589,21 @@ function collectPokemon(status) {
   });
 }
 
+// Locate an enriched mon in the latest status by its nuzlocke key, noting whether it
+// lives in the party (so the caller knows it has a writable battle-stat block).
+function findMonByKey(status, key) {
+  const adapterId = status?.adapterId || DEFAULT_ADAPTER_ID;
+  for (const mon of status?.party || []) {
+    if (monIdentity(mon, adapterId) === key) return { mon, isParty: true };
+  }
+  for (const box of status?.pc?.boxes || []) {
+    for (const mon of box.pokemon || []) {
+      if (monIdentity(mon, adapterId) === key) return { mon, isParty: false };
+    }
+  }
+  return null;
+}
+
 function syncNuzlockeMon(mon) {
   const now = new Date().toISOString();
   const hp = Number.isFinite(mon.hp) ? mon.hp : null;
@@ -709,6 +755,7 @@ const httpServer = http.createServer(async (req, res) => {
         nuzlocke:     'GET  /nuzlocke',
         nuzlockeData: 'GET  /nuzlocke/status',
         nuzlockeMoves: 'GET  /nuzlocke/moves?species=',
+        nuzlockeEdit: 'POST /nuzlocke/edit',
         obs:          'GET  /obs',
         status:       'GET  /status',
         latest:       'GET  /party/latest',
@@ -908,6 +955,88 @@ const httpServer = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && url.pathname === '/nuzlocke/edit') {
+    try {
+      const body = JSON.parse(await readBody(req) || '{}');
+      if (!body.key) throw new Error('Expected { key, changes }');
+      if (!latestStatus) throw new Error('尚未收到任何状态');
+      const adapterId = latestStatus.adapterId || DEFAULT_ADAPTER_ID;
+      const found = findMonByKey(latestStatus, body.key);
+      if (!found) throw new Error('找不到该宝可梦（可能已离开队伍/盒子）');
+      const { mon, isParty } = found;
+      const context = getAdapterContext(adapterId);
+      const changes = body.changes || {};
+
+      const clamp = (value, lo, hi, fallback) => {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return fallback;
+        return Math.max(lo, Math.min(hi, Math.floor(n)));
+      };
+      const STAT6 = ['hp', 'attack', 'defense', 'speed', 'spAttack', 'spDefense'];
+
+      const parts = [`personality=${mon.personality >>> 0}`, `otId=${mon.otId >>> 0}`];
+
+      // EVs / IVs are always sent so a party mon's recomputed stat block stays consistent.
+      const evs = {};
+      const ivs = {};
+      for (const stat of STAT6) {
+        evs[stat] = clamp(changes.evs?.[stat] ?? mon.evs?.[stat] ?? 0, 0, 255, 0);
+        ivs[stat] = clamp(changes.ivs?.[stat] ?? mon.ivs?.[stat] ?? 0, 0, 31, 0);
+      }
+      parts.push(`evHp=${evs.hp}`, `evAtk=${evs.attack}`, `evDef=${evs.defense}`,
+        `evSpd=${evs.speed}`, `evSpAtk=${evs.spAttack}`, `evSpDef=${evs.spDefense}`);
+      parts.push(`ivHp=${ivs.hp}`, `ivAtk=${ivs.attack}`, `ivDef=${ivs.defense}`,
+        `ivSpd=${ivs.speed}`, `ivSpAtk=${ivs.spAttack}`, `ivSpDef=${ivs.spDefense}`);
+
+      // Nature + ability slot fold into the personality value (and the hidden-ability bit).
+      const targetNature = changes.nature != null
+        ? clamp(changes.nature, 0, 24, mon.natureId ?? 0)
+        : (mon.natureId ?? 0);
+      let hiddenAbility = mon.hiddenAbility ? 1 : 0;
+      let abilityBit = mon.abilityNum ? 1 : 0;
+      if (changes.ability === 'hidden') hiddenAbility = 1;
+      else if (changes.ability === 'first') { hiddenAbility = 0; abilityBit = 0; }
+      else if (changes.ability === 'second') { hiddenAbility = 0; abilityBit = 1; }
+      parts.push(`hiddenAbility=${hiddenAbility}`);
+      const newPersonality = personalityForNatureAndAbility(mon.personality >>> 0, targetNature, abilityBit);
+      if ((newPersonality >>> 0) !== (mon.personality >>> 0)) {
+        parts.push(`set_personality=${newPersonality >>> 0}`);
+      }
+
+      // Level → experience (the actual stored field; level is derived from it on read).
+      let targetLevel = Number.isInteger(mon.level) ? mon.level : null;
+      if (changes.level != null) {
+        targetLevel = clamp(changes.level, 1, 100, mon.level || 1);
+        const growthRateName = resolveGrowthRateName(mon, context.growthRateData, adapterId);
+        const exp = expForLevel(growthRateName, targetLevel);
+        if (exp == null) throw new Error('无法推断该宝可梦的成长曲线，等级修改已跳过');
+        parts.push(`experience=${exp}`);
+      }
+
+      if (changes.heldItem != null) parts.push(`heldItem=${clamp(changes.heldItem, 0, 65535, 0)}`);
+      if (changes.friendship != null) parts.push(`friendship=${clamp(changes.friendship, 0, 255, 0)}`);
+
+      // Party-only battle-stat block: recompute from the new level/EV/IV/nature so the
+      // change is visible immediately. Lua ignores these fields for boxed mons.
+      if (isParty && Number.isInteger(targetLevel)) {
+        const speciesRecord = lookupById(context.data.species, mon.species);
+        const calc = calculateStats({ ivs, evs, natureId: targetNature, level: targetLevel }, mon.baseStats, speciesRecord);
+        parts.push(`level=${targetLevel}`);
+        if (calc) {
+          parts.push(`maxHp=${calc.maxHP}`, `hp=${calc.maxHP}`,
+            `stAtk=${calc.stats.attack}`, `stDef=${calc.stats.defense}`, `stSpd=${calc.stats.speed}`,
+            `stSpAtk=${calc.stats.spAttack}`, `stSpDef=${calc.stats.spDefense}`);
+        }
+      }
+
+      const result = await sendEditCommand(parts);
+      sendJson(res, 200, { ok: true, message: result.message || '', applied: parts });
+    } catch (error) {
+      sendJson(res, 400, { ok: false, error: error.message });
+    }
+    return;
+  }
+
   if (req.method === 'GET' && (url.pathname === '/status' || url.pathname === '/party/latest')) {
     if (!latestStatus) {
       sendJson(res, 404, { ok: false, error: 'No status received yet' });
@@ -936,6 +1065,44 @@ const httpServer = http.createServer(async (req, res) => {
 
 const tcpSockets = new Set();
 
+// ── edit (cheat) command channel ───────────────────────────────────────────────
+// We push pipe-delimited EDIT commands back over the mGBA socket and correlate the
+// Lua ACK reply by id. The Lua side does the memory writes; see party_export.lua.
+
+const pendingEdits = new Map();
+let editCommandSeq = 0;
+
+function sendEditCommand(parts) {
+  const sockets = [...tcpSockets];
+  if (!sockets.length) return Promise.reject(new Error('mGBA 未连接（Lua 脚本未运行？）'));
+  const id = String(++editCommandSeq);
+  const line = ['EDIT', `id=${id}`, ...parts].join('|') + '\n';
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      pendingEdits.delete(id);
+      reject(new Error('mGBA 未在超时内确认（命令可能仍已执行，请观察游戏）'));
+    }, 2000);
+    pendingEdits.set(id, { resolve, reject, timer });
+    for (const socket of sockets) {
+      try { socket.write(line); } catch { /* a dead socket will be cleaned up on close */ }
+    }
+  });
+}
+
+function handleEditAck(line) {
+  const fields = {};
+  for (const part of line.split('|')) {
+    const eq = part.indexOf('=');
+    if (eq > 0) fields[part.slice(0, eq)] = part.slice(eq + 1);
+  }
+  const pending = pendingEdits.get(fields.id);
+  if (!pending) return;
+  clearTimeout(pending.timer);
+  pendingEdits.delete(fields.id);
+  if (fields.ok === '1') pending.resolve({ ok: true, message: fields.msg || '' });
+  else pending.reject(new Error(fields.msg || '修改失败'));
+}
+
 const tcpServer = net.createServer((socket) => {
   const remote = `${socket.remoteAddress}:${socket.remotePort}`;
   const adapter = getAdapter(DEFAULT_ADAPTER_ID);
@@ -951,10 +1118,14 @@ const tcpServer = net.createServer((socket) => {
       const line = buffer.slice(0, idx).trim();
       buffer = buffer.slice(idx + 1);
       if (line) {
-        try {
-          acceptParty(adapter.processPayload(JSON.parse(line)));
-        } catch (err) {
-          console.error(`[tcp] invalid JSON: ${err.message}`);
+        if (line.startsWith('ACK|')) {
+          handleEditAck(line);
+        } else {
+          try {
+            acceptParty(adapter.processPayload(JSON.parse(line)));
+          } catch (err) {
+            console.error(`[tcp] invalid JSON: ${err.message}`);
+          }
         }
       }
       idx = buffer.indexOf('\n');
