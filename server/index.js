@@ -10,6 +10,20 @@ const PROJECT_ROOT = path.resolve(ROOT_DIR, '..');
 const DASHBOARD_PATH = path.join(ROOT_DIR, 'public', 'dashboard.html');
 const NUZLOCKE_PATH = path.join(ROOT_DIR, 'public', 'nuzlocke.html');
 const OBS_PATH = path.join(ROOT_DIR, 'public', 'obs.html');
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
+
+// Static assets (vendored JS/CSS + self-hosted fonts) live under public/vendor
+// and public/fonts so the dashboards have no remote CDN dependency.
+const STATIC_PREFIXES = ['/vendor/', '/fonts/'];
+const STATIC_CONTENT_TYPES = {
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.woff2': 'font/woff2',
+  '.woff': 'font/woff',
+  '.ttf': 'font/ttf',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+};
 const NUZLOCKE_STATE_PATH = path.join(PROJECT_ROOT, '.game', 'nuzlocke-state.json');
 
 const ADAPTERS = new Map([
@@ -790,6 +804,28 @@ const httpServer = http.createServer(async (req, res) => {
       sendHtml(res, 200, fs.readFileSync(DASHBOARD_PATH, 'utf8'));
     } catch {
       sendJson(res, 500, { ok: false, error: 'dashboard.html not found' });
+    }
+    return;
+  }
+
+  if (req.method === 'GET' && STATIC_PREFIXES.some((p) => url.pathname.startsWith(p))) {
+    // Resolve under PUBLIC_DIR and reject anything that escapes it (path traversal).
+    const rel = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+    const filePath = path.normalize(path.join(PUBLIC_DIR, rel));
+    if (!filePath.startsWith(PUBLIC_DIR + path.sep)) {
+      sendJson(res, 403, { ok: false, error: 'Forbidden' });
+      return;
+    }
+    try {
+      const ext = path.extname(filePath).toLowerCase();
+      res.writeHead(200, {
+        'content-type': STATIC_CONTENT_TYPES[ext] || 'application/octet-stream',
+        'cache-control': 'public, max-age=86400',
+        'access-control-allow-origin': '*',
+      });
+      res.end(fs.readFileSync(filePath));
+    } catch {
+      sendJson(res, 404, { ok: false, error: 'Asset not found' });
     }
     return;
   }

@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nuzlocke · POKéDEX</title>
-  <link href="https://cdn.bootcdn.net/ajax/libs/vuetify/3.6.15/vuetify.min.css" rel="stylesheet">
-  <link href="https://fonts.loli.net/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
-  <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.5.13/vue.global.prod.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/vuetify/3.6.15/vuetify.min.js"></script>
+  <link href="/vendor/vuetify.min.css" rel="stylesheet">
+  <link href="/fonts/google-fonts.css" rel="stylesheet">
+  <script src="/vendor/vue.global.prod.js"></script>
+  <script src="/vendor/vuetify.min.js"></script>
   <style>
     @font-face {
       font-family: 'Zpix';
-      src: url('https://cdn.jsdelivr.net/gh/SolidZORO/zpix-pixel-font@latest/dist/Zpix.ttf') format('truetype');
+      src: url('/fonts/Zpix.ttf') format('truetype');
       font-display: swap;
     }
 
@@ -861,6 +861,10 @@
 
     @keyframes detail-fade { from { opacity: 0; } to { opacity: 1; } }
 
+    /* v-dialog content wrapper for the detail modal: don't clip the nav arrows
+       that peek outside the dialog edge. */
+    .detail-dialog { overflow: visible !important; }
+
     .detail-modal {
       position: relative;
       width: min(720px, 100%);
@@ -1581,7 +1585,7 @@
     }
 
     .edit-num {
-      width: 64px;
+      width: 72px;
       height: 30px;
       padding: 0 6px;
       border: 3px solid var(--ink);
@@ -1591,6 +1595,22 @@
       font-family: var(--font-num);
       font-size: 16px;
       text-align: right;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    /* Hide the native up/down spinner on every number input in the edit panel. */
+    .edit-body input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .edit-num::-webkit-outer-spin-button,
+    .edit-num::-webkit-inner-spin-button,
+    .edit-body input[type="number"]::-webkit-outer-spin-button,
+    .edit-body input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     .edit-num:focus {
@@ -2228,12 +2248,15 @@
     </div>
 
     <!-- ===================== DETAIL MODAL ===================== -->
-    <div
-      v-if="detail.mon"
-      class="detail-backdrop"
-      @click.self="closeDetail"
+    <v-dialog
+      :model-value="!!detail.mon"
+      persistent
+      width="720"
+      scrim="#0c1530"
+      content-class="detail-dialog"
+      @update:model-value="(v) => { if (!v) closeDetail(); }"
     >
-      <div class="detail-modal" role="dialog" aria-modal="true">
+      <div class="detail-modal" role="dialog" aria-modal="true" v-if="detail.mon">
         <div class="detail-head">
           <div class="detail-head-title">
             <span class="cursor">▶</span>
@@ -2476,7 +2499,7 @@
                 <span v-if="edit.error" class="edit-msg error">⚠ {{ edit.error }}</span>
                 <span v-else-if="edit.notice" class="edit-msg ok">{{ edit.notice }}</span>
                 <span v-else class="edit-msg hint">直接写入运行中的 mGBA 内存</span>
-                <button class="gba-btn edit-save" :disabled="edit.saving" @click="saveEdit">
+                <button class="gba-btn edit-save" style="font-family: var(--font-body);" :disabled="edit.saving" @click="saveEdit">
                   {{ edit.saving ? '写入中…' : '写入' }}
                 </button>
               </div>
@@ -2484,10 +2507,16 @@
           </section>
         </div>
       </div>
-    </div>
+    </v-dialog>
 
     <!-- ===================== MOVES MODAL ===================== -->
-    <div v-if="moves.open" class="moves-backdrop" @click.self="closeMoves">
+    <v-dialog
+      :model-value="moves.open"
+      persistent
+      width="620"
+      scrim="#0c1530"
+      @update:model-value="(v) => { if (!v) closeMoves(); }"
+    >
       <div class="moves-modal" role="dialog" aria-modal="true">
         <div class="moves-head">
           <img
@@ -2568,7 +2597,7 @@
           </template>
         </div>
       </div>
-    </div>
+    </v-dialog>
   </v-app>
 </div>
 
