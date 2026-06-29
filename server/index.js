@@ -28,8 +28,21 @@ const NUZLOCKE_STATE_PATH = path.join(PROJECT_ROOT, '.game', 'nuzlocke-state.jso
 
 const ADAPTERS = new Map([
   ['radical-red', require(path.join(PROJECT_ROOT, 'adapters', 'radical-red'))],
+  ['rnb', require(path.join(PROJECT_ROOT, 'adapters', 'rnb'))],
 ]);
 const DEFAULT_ADAPTER_ID = process.env.ADAPTER_ID || 'radical-red';
+
+// Route an incoming raw payload to the right adapter so two ROMs can be tracked without
+// reconfiguring. A Lua script may tag its payload with `romHack` (authoritative); else we
+// fall back to the GBA game code (FireRed=BPRE → Radical Red, Emerald=BPEE → Run & Bun).
+const ADAPTER_BY_GAME_CODE = { BPRE: 'radical-red', BPEE: 'rnb' };
+
+function resolveAdapterForPayload(payload) {
+  const hinted = payload?.romHack;
+  if (hinted && ADAPTERS.has(hinted)) return getAdapter(hinted);
+  const byGameCode = ADAPTER_BY_GAME_CODE[String(payload?.gameCode || '').toUpperCase()];
+  return getAdapter(byGameCode || DEFAULT_ADAPTER_ID);
+}
 
 // ── data loading ──────────────────────────────────────────────────────────────
 
@@ -1086,7 +1099,7 @@ const httpServer = http.createServer(async (req, res) => {
     try {
       const body = await readBody(req);
       const payload = JSON.parse(body || '{}');
-      acceptParty(payload.adapterId ? payload : getAdapter(DEFAULT_ADAPTER_ID).processPayload(payload));
+      acceptParty(payload.adapterId ? payload : resolveAdapterForPayload(payload).processPayload(payload));
       sendJson(res, 200, { ok: true, receivedAt: latestReceivedAt });
     } catch (error) {
       sendJson(res, 400, { ok: false, error: error.message });
@@ -1141,7 +1154,6 @@ function handleEditAck(line) {
 
 const tcpServer = net.createServer((socket) => {
   const remote = `${socket.remoteAddress}:${socket.remotePort}`;
-  const adapter = getAdapter(DEFAULT_ADAPTER_ID);
   tcpSockets.add(socket);
   console.log(`[tcp] connected ${remote}`);
   socket.setEncoding('utf8');
@@ -1158,7 +1170,8 @@ const tcpServer = net.createServer((socket) => {
           handleEditAck(line);
         } else {
           try {
-            acceptParty(adapter.processPayload(JSON.parse(line)));
+            const parsed = JSON.parse(line);
+            acceptParty(resolveAdapterForPayload(parsed).processPayload(parsed));
           } catch (err) {
             console.error(`[tcp] invalid JSON: ${err.message}`);
           }
