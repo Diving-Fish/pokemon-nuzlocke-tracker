@@ -869,6 +869,9 @@
       position: relative;
       width: min(720px, 100%);
       max-height: calc(100vh - 48px);
+      /* Mobile browsers count the area behind the URL bar / gesture bar in 100vh; the
+         dynamic viewport unit keeps the bottom (the 写入 button) on screen. */
+      max-height: calc(100dvh - 48px);
       display: flex;
       flex-direction: column;
       background: var(--paper);
@@ -1690,6 +1693,7 @@
     .moves-modal {
       width: min(1080px, 100%);
       max-height: min(88vh, 900px);
+      max-height: min(88dvh, 900px);
       display: flex;
       flex-direction: column;
       background: var(--paper);
