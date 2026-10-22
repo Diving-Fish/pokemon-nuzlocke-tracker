@@ -2381,6 +2381,7 @@
               <div class="detail-meta">
                 <div class="row"><span class="label">特性</span><span class="value">{{ displayAbility(detail.mon) }}</span></div>
                 <div class="row"><span class="label">性格</span><span class="value">{{ detail.mon.natureNameZh || detail.mon.natureName || '未知' }}</span></div>
+                <div class="row"><span class="label">性别</span><span class="value">{{ genderText(detail.mon.gender) }}{{ detail.mon.shiny ? ' · ★闪光' : '' }}</span></div>
                 <div class="row"><span class="label">携带</span><span class="value">{{ displayItem(detail.mon) }}</span></div>
                 <div class="row"><span class="label">HP</span><span class="value">{{ hpText(detail.mon) }}</span></div>
                 <div class="row"><span class="label">状态</span><span class="value">{{ detail.mon.dead ? '死亡' : '存活' }}</span></div>
@@ -2530,6 +2531,20 @@
                   <span class="edit-label">性格</span>
                   <select class="edit-input" v-model="edit.nature">
                     <option v-for="opt in natureOptions" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
+                  </select>
+                </label>
+                <label class="edit-field" v-if="genderEditable(detail.mon)">
+                  <span class="edit-label">性别</span>
+                  <select class="edit-input" v-model="edit.gender">
+                    <option value="male">♂ 公</option>
+                    <option value="female">♀ 母</option>
+                  </select>
+                </label>
+                <label class="edit-field">
+                  <span class="edit-label">闪光</span>
+                  <select class="edit-input" v-model="edit.shiny">
+                    <option :value="false">普通</option>
+                    <option :value="true">★ 闪光</option>
                   </select>
                 </label>
                 <label class="edit-field edit-field-wide">
@@ -2785,6 +2800,8 @@ function blankEdit() {
     level: '',
     nature: '',
     ability: '',
+    gender: '',
+    shiny: false,
     evs: blankEvIv(),
     ivs: blankEvIv(),
   };
@@ -3134,9 +3151,21 @@ createApp({
         level: mon?.level ?? '',
         nature: mon?.natureId ?? '',
         ability: this.currentAbilitySlot(mon),
+        gender: mon?.gender ?? '',
+        shiny: Boolean(mon?.shiny),
         evs: copy(mon?.evs),
         ivs: copy(mon?.ivs),
       };
+    },
+
+    // Gender is only editable for species with both genders (ratio 1-253).
+    genderEditable(mon) {
+      const ratio = mon?.genderRatio;
+      return Number.isInteger(ratio) && ratio > 0 && ratio < 254;
+    },
+
+    genderText(gender) {
+      return { male: '♂ 公', female: '♀ 母', genderless: '无性别' }[gender] || '未知';
     },
 
     currentAbilitySlot(mon) {
@@ -3166,6 +3195,8 @@ createApp({
       const nature = Number(this.edit.nature);
       if (Number.isInteger(nature) && nature >= 0 && nature <= 24 && nature !== mon.natureId) changes.nature = nature;
       if (this.edit.ability && this.edit.ability !== this.currentAbilitySlot(mon)) changes.ability = this.edit.ability;
+      if (this.genderEditable(mon) && this.edit.gender && this.edit.gender !== mon.gender) changes.gender = this.edit.gender;
+      if (this.edit.shiny !== Boolean(mon.shiny)) changes.shiny = this.edit.shiny;
       changes.evs = { ...this.edit.evs };
       changes.ivs = { ...this.edit.ivs };
       try {

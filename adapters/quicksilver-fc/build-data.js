@@ -330,6 +330,8 @@ function extractRom(romBuffer) {
       stats,
       type: type1 === type2 ? [type1] : [type1, type2],
       items: [u16(o + 12), u16(o + 14)],
+      // 0 always male, 254 always female, 255 genderless; else female when (personality & 0xFF) < ratio
+      genderRatio: buffer[o + 16],
       growthRate: buffer[o + 19],
       eggGroup: [buffer[o + 20], buffer[o + 21]],
       // data.js convention: [hidden, first, second]
@@ -553,6 +555,7 @@ function buildData(extracted, rrData) {
       abilities: s.abilities,
       eggGroup: s.eggGroup,
       items: s.items,
+      genderRatio: s.genderRatio,
       growthRate: s.growthRate,
       levelupMoves: s.levelupMoves,
       evolutions: s.evolutions,

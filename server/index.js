@@ -144,6 +144,9 @@ function getAdapterContext(adapterId = DEFAULT_ADAPTER_ID) {
       adapter,
       data,
       growthRateData: loadGrowthRateData(adapter.id),
+      // { speciesId: genderRatio } for adapters whose data.js lacks the field
+      // (radical-red: adapters/radical-red/build-gender-ratio.js).
+      genderRatios: loadJsonFile(path.join(PROJECT_ROOT, 'adapters', adapter.id, 'data', 'gender_ratio.json'), null),
       translations,
       moveInfo: buildMoveInfo(data),
       translationsJson: JSON.stringify({
@@ -416,24 +419,55 @@ function defaultGrowthRateName(speciesRecord, dexId, growthRateData) {
   return canonicalGrowthRateName(growthRateData.growthRateNames.get(growthRateId)) || null;
 }
 
-// Find a 32-bit personality whose nature (p % 25) and ability slot bit (p & 1) match
-// the desired values, preferring the smallest value at/above `base`. Nature and parity
-// are coprime cycles (lengths 25 and 2), so any 50 consecutive non-wrapping integers
-// cover every (nature, parity) combo. We avoid wrapping mid-search because 2^32 is not
-// a multiple of 50, which would skip residues; if `base` sits within 50 of the ceiling
-// we fall back to the [0, 49] window, which always contains a match. Changing
-// personality can also shift gender/shininess — an accepted side effect of a cheat tool.
-function personalityForNatureAndAbility(base, nature, abilityBit) {
-  const TOP = 0x100000000;
+// Gen 3 gender and shininess both derive from the personality value:
+// - gender: genderRatio 0 = always male, 254 = always female, 255 = genderless; otherwise
+//   female when (personality & 0xFF) < genderRatio.
+// - shiny: (trainer id ^ secret id ^ personality high half ^ low half) < 8.
+const SHINY_ODDS = 8;
+const genderFixed = (ratio) => ratio == null || ratio === 0 || ratio >= 254;
+
+function genderOf(personality, ratio) {
+  if (ratio == null) return null;
+  if (ratio === 255) return 'genderless';
+  if (ratio === 254) return 'female';
+  if (ratio === 0) return 'male';
+  return ((personality >>> 0) & 0xFF) < ratio ? 'female' : 'male';
+}
+
+function isShiny(personality, otId) {
+  const p = personality >>> 0;
+  const t = otId >>> 0;
+  return ((t >>> 16) ^ (t & 0xFFFF) ^ (p >>> 16) ^ (p & 0xFFFF)) < SHINY_ODDS;
+}
+
+// Find a personality with the wanted nature (p % 25), ability slot bit (p & 1), gender and
+// shininess, starting from `base` so nothing else moves when nothing has to. `gender` /
+// `shiny` of null mean "don't care". A shiny value fixes the high half from the low half,
+// so that search walks the low half; otherwise walk upward from `base`. Returns null when
+// no value fits (never for a valid request).
+function findPersonality({ base, nature, abilityBit, otId, genderRatio, gender, shiny }) {
+  const wantGender = genderFixed(genderRatio) ? null : gender;
+  const fits = (p) => p % 25 === nature && (p & 1) === abilityBit
+    && (wantGender == null || genderOf(p, genderRatio) === wantGender)
+    && (shiny == null || isShiny(p, otId) === shiny);
   const start = base >>> 0;
-  for (let k = 0; k < 50; k++) {
-    const p = start + k;
-    if (p < TOP && p % 25 === nature && (p & 1) === abilityBit) return p >>> 0;
+  if (fits(start)) return start;
+  if (shiny) {
+    const tsv = ((otId >>> 16) ^ (otId & 0xFFFF)) >>> 0;
+    for (let i = 0; i < 0x10000; i++) {
+      const lo = (start + i) & 0xFFFF;
+      for (let k = 0; k < SHINY_ODDS; k++) {
+        const p = (((tsv ^ lo ^ k) << 16) | lo) >>> 0;
+        if (fits(p)) return p;
+      }
+    }
+    return null;
   }
-  for (let p = 0; p < 50; p++) {
-    if (p % 25 === nature && (p & 1) === abilityBit) return p;
+  for (let i = 1; i < 0x1000000; i++) {
+    const p = (start + i) >>> 0;
+    if (fits(p)) return p;
   }
-  return start;
+  return null;
 }
 
 function inferLevel(mon, speciesRecord, growthRateData, adapterId) {
@@ -517,6 +551,7 @@ function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID, growthRateData = n
     spAttack:  speciesStats[4] ?? 0,
     spDefense: speciesStats[5] ?? 0,
   } : null;
+  const genderRatio = speciesRecord?.genderRatio ?? getAdapterContext(adapterId).genderRatios?.[mon.species] ?? null;
   const inferredLevel = inferLevel(mon, speciesRecord, growthRateData, adapterId);
   const monWithLevel = inferredLevel ? { ...mon, level: inferredLevel.level } : mon;
   const calculatedStats = calculateStats(monWithLevel, baseStats, speciesRecord);
@@ -549,6 +584,9 @@ function enrichMon(mon, data, adapterId = DEFAULT_ADAPTER_ID, growthRateData = n
     abilityId:         ability.abilityId,
     abilityName:       ability.abilityName,
     abilityCandidates: ability.abilityCandidates,
+    genderRatio,
+    gender:            genderOf(mon.personality, genderRatio),
+    shiny:             mon.personality != null && mon.otId != null ? isShiny(mon.personality, mon.otId) : null,
     baseStats,
     spriteUrl:          localSpriteUrl(adapterId, mon.species) || defaultSpriteUrl({ speciesName, formName: formSuffix }),
   };
@@ -1123,7 +1161,20 @@ const httpServer = http.createServer(async (req, res) => {
       else if (changes.ability === 'first') { hiddenAbility = 0; abilityBit = 0; }
       else if (changes.ability === 'second') { hiddenAbility = 0; abilityBit = 1; }
       parts.push(`hiddenAbility=${hiddenAbility}`);
-      const newPersonality = personalityForNatureAndAbility(mon.personality >>> 0, targetNature, abilityBit);
+      // Gender and shininess also live in the personality: keep them unless asked to change.
+      if (changes.gender != null && changes.gender !== mon.gender && genderFixed(mon.genderRatio)) {
+        throw new Error('这只宝可梦的性别是固定的，不能修改');
+      }
+      const newPersonality = findPersonality({
+        base: mon.personality,
+        nature: targetNature,
+        abilityBit,
+        otId: mon.otId >>> 0,
+        genderRatio: mon.genderRatio,
+        gender: changes.gender ?? mon.gender,
+        shiny: changes.shiny != null ? Boolean(changes.shiny) : mon.shiny,
+      });
+      if (newPersonality == null) throw new Error('找不到同时满足性格、特性、性别和闪光的性格值');
       if ((newPersonality >>> 0) !== (mon.personality >>> 0)) {
         parts.push(`set_personality=${newPersonality >>> 0}`);
       }
