@@ -304,8 +304,11 @@ local function isValidBoxMon(mon)
 	return mon.species and mon.species > 0 and mon.species < 2000 and mon.isEgg == 0 and mon.personality ~= 0 and mon.personality ~= 0xFFFFFFFF
 end
 
+-- The game decides a PC slot is occupied by its species alone. Records written by save
+-- editors (e.g. the 水银FC website's event gifts) leave the hasSpecies flag and language
+-- at 0, so requiring hasSpecies would hide them. An empty slot is all zeroes.
 local function isValidPcMon(mon)
-	return isValidBoxMon(mon) and mon.hasSpecies == 1 and mon.isBadEgg == 0
+	return mon.species and mon.species > 0 and mon.species < 2000 and mon.isEgg == 0 and mon.isBadEgg == 0
 end
 
 local function readPcMon(address)
