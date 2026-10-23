@@ -786,16 +786,21 @@ local function applyEditParty(address, fields)
 		emu:write32(address, newPersonality & 0xFFFFFFFF)
 	end
 
-	-- The checksum is the sum of the (logical/decrypted) words' 16-bit halves regardless
-	-- of whether the mon is stored encrypted or plain, so it's computed the same way here.
-	local checksum = 0
-	for li = 1, 4 do
-		for w = 1, 3 do
-			local d = words[li][w]
-			checksum = checksum + (d & 0xFFFF) + ((d >> 16) & 0xFFFF)
+	-- Only the encrypted layout carries a real checksum (sum of the decrypted words'
+	-- 16-bit halves). CFRU's plain party mons keep these two bytes at 0 and the game never
+	-- maintains them, so leave them untouched: writing a checksum there turned an edited
+	-- 水银FC Gible into whatever species ID the sum happened to equal (342 = Sealeo) once
+	-- the mon later went into the PC.
+	if encrypted then
+		local checksum = 0
+		for li = 1, 4 do
+			for w = 1, 3 do
+				local d = words[li][w]
+				checksum = checksum + (d & 0xFFFF) + ((d >> 16) & 0xFFFF)
+			end
 		end
+		emu:write16(address + 28, checksum & 0xFFFF)
 	end
-	emu:write16(address + 28, checksum & 0xFFFF)
 
 	if encrypted then
 		local newKey = newPersonality ~ otId
